@@ -13,20 +13,6 @@ public class BoardBuilder {
 
     private TileModel tileModel;
 
-    public class Tile {
-
-        public ModelInstance tileInstance;
-        public Vector3 worldCenter;
-
-        public Tile(ModelInstance m, Vector3 v) {
-
-            tileInstance = m;
-            worldCenter = v;
-
-        }
-
-    }
-
     private ArrayList<ArrayList<Tile>> tiles;
 
     private final Model redTile;
@@ -56,7 +42,7 @@ public class BoardBuilder {
         float tileW = TileModel.getWidth();
 
         BoundingBox bounds = new BoundingBox();
-        Vector3 center = new Vector3();
+
 
         for (float x = 0; x < width; x +=1f) {
 
@@ -76,9 +62,10 @@ public class BoardBuilder {
                 tileInstance.transform.setToTranslation(x * tileW , 0 ,z * tileH);
 
                 tileInstance.calculateBoundingBox(bounds);
+
+                Vector3 center = new Vector3();
                 bounds.getCenter(center);
                 center.mul(tileInstance.transform);
-                center.y = 5;
 
                 row.add(new Tile(tileInstance, center));
             }
@@ -88,7 +75,4 @@ public class BoardBuilder {
 
         return tiles;
     }
-
-
-
 }
