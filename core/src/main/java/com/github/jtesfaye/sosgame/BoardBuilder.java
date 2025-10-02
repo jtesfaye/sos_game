@@ -1,9 +1,9 @@
 package com.github.jtesfaye.sosgame;
 
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.github.jtesfaye.sosgame.Components.TileModel;
 
 import java.util.ArrayList;

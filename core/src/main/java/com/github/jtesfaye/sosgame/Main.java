@@ -1,9 +1,8 @@
 package com.github.jtesfaye.sosgame;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
-import com.github.jtesfaye.sosgame.BoardBuilder;
 import com.github.jtesfaye.sosgame.Screens.GameScreen;
+import com.github.jtesfaye.sosgame.Screens.MainMenuScreen;
 
 public class Main extends Game {
 
@@ -12,7 +11,7 @@ public class Main extends Game {
     @Override
     public void create() {
 
-        setScreen(new GameScreen(3,3));
+        setScreen(new MainMenuScreen(this));
 
     }
 }
