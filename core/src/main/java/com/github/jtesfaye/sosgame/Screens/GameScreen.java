@@ -1,21 +1,22 @@
 package com.github.jtesfaye.sosgame.Screens;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.Gdx;
 
-import com.badlogic.gdx.math.Vector3;
-import com.github.jtesfaye.sosgame.BoardBuilder;
+import com.github.jtesfaye.sosgame.Tile;
+import com.github.jtesfaye.sosgame.GameInput;
 import com.github.jtesfaye.sosgame.BoardState;
+import com.github.jtesfaye.sosgame.BoardBuilder;
+import com.github.jtesfaye.sosgame.util.utilFunctions;
 import com.github.jtesfaye.sosgame.Components.TileModel;
 import com.github.jtesfaye.sosgame.Components.oPieceModel;
 import com.github.jtesfaye.sosgame.Components.sPieceModel;
-import com.github.jtesfaye.sosgame.GameInput;
-import com.github.jtesfaye.sosgame.Tile;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,12 @@ public class GameScreen implements Screen {
     private ArrayList<ArrayList<Tile>> tiles;
     private final BoardState board;
 
-    public GameScreen(int width, int height) {
+    public GameScreen(String boardSize, String gameMode) {
+
+        int[] dimensions = utilFunctions.getBoardDimensions(boardSize);
+
+        int width = dimensions[0];
+        int height = dimensions[1];
 
         builder = new BoardBuilder(width, height);
         boardWidth = width;
