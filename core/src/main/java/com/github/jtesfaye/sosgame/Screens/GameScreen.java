@@ -2,13 +2,9 @@ package com.github.jtesfaye.sosgame.Screens;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 
@@ -19,6 +15,7 @@ import com.github.jtesfaye.sosgame.Components.TileModel;
 import com.github.jtesfaye.sosgame.Components.oPieceModel;
 import com.github.jtesfaye.sosgame.Components.sPieceModel;
 import com.github.jtesfaye.sosgame.GameInput;
+import com.github.jtesfaye.sosgame.Tile;
 
 import java.util.ArrayList;
 
@@ -34,10 +31,8 @@ public class GameScreen implements Screen {
     private sPieceModel sp;
     private oPieceModel op;
 
-    private ArrayList<ArrayList<BoardBuilder.Tile>> tiles;
+    private ArrayList<ArrayList<Tile>> tiles;
     private final BoardState board;
-
-    private ShapeRenderer shapeRenderer; //Used for debugging
 
     public GameScreen(int width, int height) {
 
@@ -53,7 +48,7 @@ public class GameScreen implements Screen {
     public ModelInstance renderPiece(Model m, Vector3 center) {
 
         ModelInstance inst = new ModelInstance(m);
-        inst.transform.setToTranslation(center);
+        inst.transform.setToTranslation(center).translate(0,0f,0f).scale(3f,3f,3f);
 
         return inst;
 
@@ -84,13 +79,13 @@ public class GameScreen implements Screen {
         System.out.println(tiles.size());
         System.out.println(tiles.get(0).size());
 
-        shapeRenderer = new ShapeRenderer();
-
         ArrayList <ArrayList<ModelInstance>> tileInstances = new ArrayList<>();
 
-        for (ArrayList<BoardBuilder.Tile> tiles: tiles) {
+        for (ArrayList<Tile> tiles: tiles) {
+
             ArrayList<ModelInstance> tile_row = new ArrayList<>();
-            for (BoardBuilder.Tile t : tiles) {
+
+            for (Tile t : tiles) {
                 tile_row.add(t.tileInstance);
             }
 
@@ -136,20 +131,6 @@ public class GameScreen implements Screen {
 
         modelBatch.end();
 
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-        shapeRenderer.setColor(1, 0, 0, 1);
-        shapeRenderer.line(0, 0, 0, 5, 0, 0);
-
-        shapeRenderer.setColor(0, 1, 0, 1);
-        shapeRenderer.line(0, 0, 0, 0, 5, 0);
-
-        shapeRenderer.setColor(0, 0, 1, 1);
-        shapeRenderer.line(0, 0, 0, 0, 0, 5);
-
-        shapeRenderer.end();
-
     }
 
     @Override
@@ -174,7 +155,6 @@ public class GameScreen implements Screen {
     public void dispose() {
 
         modelBatch.dispose();
-        shapeRenderer.dispose();
 
     }
 }
