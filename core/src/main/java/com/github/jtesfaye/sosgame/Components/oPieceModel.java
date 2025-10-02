@@ -15,7 +15,7 @@ public class oPieceModel {
     public oPieceModel() {
 
         ObjLoader loader = new ObjLoader();
-        oPieceModel = loader.loadModel(Gdx.files.internal("Grenade.obj"));
+        oPieceModel = loader.loadModel(Gdx.files.internal("oPiece.obj"));
 
     }
 

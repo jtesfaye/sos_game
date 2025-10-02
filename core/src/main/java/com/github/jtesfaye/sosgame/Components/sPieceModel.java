@@ -15,7 +15,8 @@ public class sPieceModel {
 
     public sPieceModel() {
 
-        sPieceModel = new G3dModelLoader(new JsonReader()).loadModel(Gdx.files.internal("hourse.g3dj"));
+        ObjLoader loader = new ObjLoader();
+        sPieceModel = loader.loadModel(Gdx.files.internal("sPiece.obj"));
 
     }
 
