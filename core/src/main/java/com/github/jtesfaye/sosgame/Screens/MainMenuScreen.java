@@ -46,6 +46,7 @@ public class MainMenuScreen implements Screen {
         table.row();
 
         TextButton startButton = new TextButton("Start game", skin);
+
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

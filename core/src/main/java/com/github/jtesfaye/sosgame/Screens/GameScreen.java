@@ -9,14 +9,17 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 
+import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.Tile;
 import com.github.jtesfaye.sosgame.GameInput;
 import com.github.jtesfaye.sosgame.BoardState;
 import com.github.jtesfaye.sosgame.BoardBuilder;
+import com.github.jtesfaye.sosgame.util.Pair;
 import com.github.jtesfaye.sosgame.util.utilFunctions;
 import com.github.jtesfaye.sosgame.Components.TileModel;
 import com.github.jtesfaye.sosgame.Components.oPieceModel;
 import com.github.jtesfaye.sosgame.Components.sPieceModel;
+import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
 
 import java.util.ArrayList;
 
@@ -31,21 +34,21 @@ public class GameScreen implements Screen {
     private Environment env;
     private sPieceModel sp;
     private oPieceModel op;
+    private final GameLogic logic;
 
     private ArrayList<ArrayList<Tile>> tiles;
-    private final BoardState board;
 
     public GameScreen(String boardSize, String gameMode) {
 
-        int[] dimensions = utilFunctions.getBoardDimensions(boardSize);
+        Pair<Integer, Integer> dimensions = utilFunctions.getBoardDimensions(boardSize);
 
-        int width = dimensions[0];
-        int height = dimensions[1];
+        boardWidth = dimensions.first;
+        boardHeight = dimensions.second;
 
-        builder = new BoardBuilder(width, height);
-        boardWidth = width;
-        boardHeight = height;
-        board = new BoardState(width, height);
+        logic = GameLogicFactory.createGameLogic(boardWidth, boardHeight, gameMode);
+
+        builder = new BoardBuilder(boardWidth, boardHeight);
+
         sp = new sPieceModel();
         op = new oPieceModel();
 
@@ -98,7 +101,7 @@ public class GameScreen implements Screen {
             tileInstances.add(tile_row);
         }
 
-        GameInput inputProcessor = new GameInput(camera, tileInstances, board);
+        GameInput inputProcessor = new GameInput(camera, tileInstances, logic);
         Gdx.input.setInputProcessor(inputProcessor);
 
     }
@@ -120,7 +123,7 @@ public class GameScreen implements Screen {
                 Vector3 center = tiles.get(row).get(col).worldCenter;
                 modelBatch.render(inst, env);
 
-                switch(board.getPiece(row, col)) {
+                switch(logic.getPiece(row, col)) {
 
                     case sPiece:
                         modelBatch.render(renderPiece(sp.getPieceModel(), center));

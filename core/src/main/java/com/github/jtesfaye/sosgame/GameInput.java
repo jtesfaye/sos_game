@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 
 import java.util.ArrayList;
 
@@ -15,15 +16,21 @@ public class GameInput extends InputAdapter {
 
     private final PerspectiveCamera camera;
     private final ArrayList<ArrayList<ModelInstance>> tiles;
-    private final BoardState board;
+    private final GameLogic logic;
 
-    public GameInput(PerspectiveCamera c, ArrayList<ArrayList<ModelInstance>> t, BoardState s) {
+    private final int row;
+    private final int height;
+
+
+    public GameInput(PerspectiveCamera c, ArrayList<ArrayList<ModelInstance>> t, GameLogic l) {
         super();
 
         camera = c;
         tiles = t;
-        board = s;
+        logic = l;
 
+        row = t.size();
+        height = t.get(0).size();
     }
 
     @Override
@@ -31,8 +38,8 @@ public class GameInput extends InputAdapter {
 
         Ray ray = camera.getPickRay(screenX, screenY);
 
-        for (int r = 0; r < board.row; r++) {
-            for (int c = 0; c < board.col; c++) {
+        for (int r = 0; r < row; r++) {
+            for (int c = 0; c < height; c++) {
 
                 ModelInstance tile = tiles.get(r).get(c);
 
@@ -43,10 +50,10 @@ public class GameInput extends InputAdapter {
                 if (Intersector.intersectRayBoundsFast(ray, bounds)) {
 
                     if (button == Input.Buttons.LEFT) {
-                        return board.setPiece(r, c, BoardState.State.sPiece);
+                        return logic.setPiece(r, c, GameLogic.State.sPiece);
 
                     } else if (button == Input.Buttons.RIGHT) {
-                        return board.setPiece(r, c, BoardState.State.oPiece);
+                        return logic.setPiece(r, c, GameLogic.State.oPiece);
 
                     }
                 }
