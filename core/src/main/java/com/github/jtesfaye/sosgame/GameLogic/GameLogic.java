@@ -2,7 +2,9 @@ package com.github.jtesfaye.sosgame.GameLogic;
 
 import com.github.jtesfaye.sosgame.util.Pair;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 
 public abstract class GameLogic {
 
@@ -99,9 +101,15 @@ public abstract class GameLogic {
         return board[r][c];
     }
 
+    private boolean checkBounds(int r, int c) {
+
+        return (r >= 0 && r < boardRow) && (c >= 0 && c < boardCol);
+
+    }
+
     protected boolean checkSOS(int r, int c) {
 
-        if (this.isDownDiagonal(r, c))
+        if (this.isDiagonal(r, c))
             return true;
 
         if (this.isHorizontal(r, c))
@@ -111,111 +119,41 @@ public abstract class GameLogic {
     }
 
 
-    protected boolean isDownDiagonal(int row, int col) {
+    protected boolean isDiagonal(int row, int col) {
 
-        int r = row;
-        int c = col;
+        if (board[row][col].equals(Piece.oPiece)) {
 
-        ArrayList<String> pieces = new ArrayList<>();
+            int[][] dir = {{1,1}, {-1, 1}};
 
-        while (r < boardRow && c < boardCol) {
-            pieces.add(board[r][c].toString());
-            r++;
-            c++;
+            for (int[] d : dir) {
+
+                if (checkBounds( row + d[0], col + d[1]) && checkBounds(row - d[0], col - d[1])) {
+
+                    if(board[row + d[0]][col + d[1]].equals(Piece.sPiece)
+                        && board[row - d[0]][col - d[1]].equals(Piece.sPiece)) {
+                        return true;
+                    }
+                }
+            }
         }
 
-        String res = String.join("", pieces);
+        if (board[row][col].equals(Piece.sPiece)) {
 
-        if (res.equals("SOS")) {
-            return true;
+            int[][] dir = {{1,1}, {-1, 1}, {1, -1}, {-1, -1}};
+
+            for (int[] d : dir) {
+
+                if (checkBounds(row + 2 * d[0], col + 2 * d[1])) {
+
+                    if (board[row + d[0]][col + d[0]].equals(Piece.oPiece)
+                        && board[row + 2 * d[0]][col + 2 * d[0]].equals(Piece.sPiece)) {
+                        return true;
+                    }
+                }
+            }
         }
 
-        pieces.clear();
-
-        while (r > 0 && c > 0) {
-
-            pieces.add(board[r][c].toString());
-            r--;
-            c--;
-        }
-
-
-        res = String.join("", pieces);
-
-        if (res.equals("SOS")) {
-            return true;
-        }
-
-        pieces.clear();
-
-
-        if (r > 0 && col > 0) {
-            pieces.add(board[row-1][col-1].toString());
-        }
-
-        pieces.add(board[row][col].toString());
-
-        if (r < boardRow && col < boardRow) {
-            pieces.add(board[r+1][c+1].toString());
-        }
-
-        res = String.join("", pieces);
-
-        return res.equals("SOS");
-    }
-
-    protected boolean isUpDiagonal(int row, int col) {
-
-        int r = row;
-        int c = col;
-
-        ArrayList<String> pieces = new ArrayList<>();
-
-        while (r > 0 && c < boardCol) {
-            pieces.add(board[r][c].toString());
-            r--;
-            c++;
-        }
-
-        String res = String.join("", pieces);
-
-        if (res.equals("SOS")) {
-            return true;
-        }
-
-        pieces.clear();
-
-        while (r < boardRow && c > 0) {
-
-            pieces.add(board[r][c].toString());
-            r++;
-            c--;
-        }
-
-
-        res = String.join("", pieces);
-
-        if (res.equals("SOS")) {
-            return true;
-        }
-
-        pieces.clear();
-
-
-        if (r-1 > 0 && col + 1 < boardCol) {
-            pieces.add(board[row-1][col+1].toString());
-        }
-
-        pieces.add(board[row][col].toString());
-
-        if (r + 1 < boardRow && col - 1 > 0) {
-            pieces.add(board[r+1][c-1].toString());
-        }
-
-        res = String.join("", pieces);
-
-        return res.equals("SOS");
-
+        return false;
     }
 
     protected boolean isVertical(int r, int c) {
