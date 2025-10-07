@@ -38,7 +38,16 @@ public abstract class GameLogic {
     protected final Piece[][] board;
     protected int capacity;
 
-    protected Pair<Integer, Integer> mostRecentPiece;
+    /**
+     * This function checks if there is a winner. It does not determine who the winner is.
+     */
+    public abstract boolean isWinner();
+
+    /**
+     * This function determines which player won the game. It is only called if isWinner returns true
+     */
+    public abstract Player getWinner();
+
 
     protected GameLogic(int r, int c) {
 
@@ -56,16 +65,6 @@ public abstract class GameLogic {
 
     }
 
-    /**
-     * This function checks if there is a winner. It does not determine who the winner is.
-     */
-    public abstract boolean isWinner();
-
-    /**
-     * This function determines which player won the game. It is only called if isWinner returns true
-     */
-    public abstract Player getWinner();
-
     public boolean isOpen(int r, int c) {
 
         if (r >= boardRow || c >= boardCol) {
@@ -81,8 +80,6 @@ public abstract class GameLogic {
             return false;
 
         board[r][c] = piece;
-
-        mostRecentPiece = new Pair<>(r,c);
 
         checkSOS(r, c);
 
@@ -145,8 +142,8 @@ public abstract class GameLogic {
 
                 if (checkBounds(row + 2 * d[0], col + 2 * d[1])) {
 
-                    if (board[row + d[0]][col + d[0]].equals(Piece.oPiece)
-                        && board[row + 2 * d[0]][col + 2 * d[0]].equals(Piece.sPiece)) {
+                    if (board[row + d[0]][col + d[1]].equals(Piece.oPiece)
+                        && board[row + 2 * d[0]][col + 2 * d[1]].equals(Piece.sPiece)) {
                         return true;
                     }
                 }
@@ -156,7 +153,37 @@ public abstract class GameLogic {
         return false;
     }
 
-    protected boolean isVertical(int r, int c) {
+    protected boolean isVertical(int row, int col) {
+
+
+        if (board[row][col].equals(Piece.oPiece)) {
+
+            if (checkBounds(row + 1, col) && checkBounds(row - 1, col)) {
+                System.out.printf("Here %s %s \n", row + 1, col);
+                if (board[row + 1][col].equals(Piece.sPiece)
+                    && board[row - 1][col].equals(Piece.sPiece)) {
+                    System.out.println("Bar");
+                    return true;
+                }
+            }
+        }
+
+        if (board[row][col].equals(Piece.sPiece)) {
+
+            int[][] dir = {{1,0}, {-1, 0}};
+
+            for (int[] d : dir) {
+
+                if (checkBounds(row + d[0], col) && checkBounds(row + 2*d[0], col)) {
+
+                    if (board[row + d[0]][col].equals(Piece.oPiece)
+                        && board[row + 2 * d[0]][col].equals(Piece.sPiece)) {
+                        System.out.println("Foo");
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
