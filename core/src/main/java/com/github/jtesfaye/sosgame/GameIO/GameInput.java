@@ -1,6 +1,5 @@
-package com.github.jtesfaye.sosgame;
+package com.github.jtesfaye.sosgame.GameIO;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Intersector;
@@ -9,6 +8,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
+import com.github.jtesfaye.sosgame.GameLogic.Piece;
 
 import java.util.ArrayList;
 
@@ -16,21 +16,23 @@ public class GameInput extends InputAdapter {
 
     private final PerspectiveCamera camera;
     private final ArrayList<ArrayList<ModelInstance>> tiles;
-    private final GameLogic logic;
 
     private final int row;
     private final int height;
 
+    private final InputHandler handler;
 
-    public GameInput(PerspectiveCamera c, ArrayList<ArrayList<ModelInstance>> t, GameLogic l) {
+
+    public GameInput(PerspectiveCamera c, ArrayList<ArrayList<ModelInstance>> t, InputHandler handler) {
         super();
 
         camera = c;
         tiles = t;
-        logic = l;
 
         row = t.size();
         height = t.get(0).size();
+
+        this.handler = handler;
     }
 
     @Override
@@ -48,14 +50,7 @@ public class GameInput extends InputAdapter {
                 bounds.mul(tile.transform);
 
                 if (Intersector.intersectRayBoundsFast(ray, bounds)) {
-
-                    if (button == Input.Buttons.LEFT) {
-                        return logic.setPiece(r, c, GameLogic.State.sPiece);
-
-                    } else if (button == Input.Buttons.RIGHT) {
-                        return logic.setPiece(r, c, GameLogic.State.oPiece);
-
-                    }
+                    return handler.handleClick(r, c, button == Input.Buttons.LEFT);
                 }
             }
         }
