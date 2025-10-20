@@ -10,39 +10,41 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 public class TileModel {
 
 
-    private final Model redTile;
-    private final Model greenTile;
+    private final Model primaryTile;
+    private final Model secondaryTile;
     private static final int width = 3;
     private static final int height = 3;
 
-    public TileModel() {
+    public TileModel(Color primColor, Color secColor) {
 
         ModelBuilder builder = new ModelBuilder();
 
-        redTile = builder.createBox(
+        primaryTile = builder.createBox(
             width,
             0.1f,
             height,
-            new Material(ColorAttribute.createDiffuse(Color.RED)),
+            new Material(ColorAttribute.createDiffuse(primColor)),
             VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
                 | VertexAttributes.Usage.TextureCoordinates
         );
 
-        greenTile = builder.createBox(
+        secondaryTile = builder.createBox(
             width,
             0.1f,
             height,
-            new Material(ColorAttribute.createDiffuse(Color.GREEN)),
+            new Material(ColorAttribute.createDiffuse(secColor)),
             VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
                 | VertexAttributes.Usage.TextureCoordinates
         );
     }
 
-    public Model getRedTileModel() {
-        return redTile;
+    public Model getPrimaryTile() {
+        return primaryTile;
     }
 
-    public Model getGreenTileModel() {return greenTile;}
+    public Model getSecondaryTile() {
+        return secondaryTile;
+    }
 
     public static float getWidth() {return width;}
 
