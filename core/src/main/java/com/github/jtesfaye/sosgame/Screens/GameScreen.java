@@ -2,30 +2,22 @@ package com.github.jtesfaye.sosgame.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+
+import com.github.jtesfaye.sosgame.util.GameInit;
+import com.github.jtesfaye.sosgame.GameIO.GameInput;
+import com.github.jtesfaye.sosgame.GameIO.InputHandler;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.BoardComponents.Tile;
-import com.github.jtesfaye.sosgame.GameIO.GameInput;
-import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
-import com.github.jtesfaye.sosgame.util.Pair;
-import com.github.jtesfaye.sosgame.util.utilFunctions;
-import com.github.jtesfaye.sosgame.BoardComponents.TileModel;
+import com.github.jtesfaye.sosgame.util.GameInitializer;
 import com.github.jtesfaye.sosgame.BoardComponents.oPieceModel;
 import com.github.jtesfaye.sosgame.BoardComponents.sPieceModel;
-import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
+import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
 
 import java.util.ArrayList;
 
@@ -33,8 +25,6 @@ public class GameScreen implements Screen {
 
     private PerspectiveCamera camera;
 
-    private final int boardWidth;
-    private final int boardHeight;
     private final BoardBuilder builder;
     private ModelBatch modelBatch;
     private Environment env;
@@ -48,34 +38,14 @@ public class GameScreen implements Screen {
     private final Stage stage;
     private final Label currentTurn;
 
-    public GameScreen(String boardSize, String gameMode) {
+    public GameScreen(GameInit init) {
 
-        Pair<Integer, Integer> dimensions = utilFunctions.getBoardDimensions(boardSize);
-
-        boardWidth = dimensions.first;
-        boardHeight = dimensions.second;
-
-        logic = GameLogicFactory.createGameLogic(boardWidth, boardHeight, gameMode);
-
-        builder = new BoardBuilder(boardWidth, boardHeight, Color.CHARTREUSE, Color.RED);
-
+        logic = init.getLogic();
+        builder = init.getBuilder();
         sp = new sPieceModel();
         op = new oPieceModel();
-
-        SpriteBatch batch = new SpriteBatch();
-        stage = new Stage(new ScreenViewport(), batch);
-
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
-
-        currentTurn = new Label("Current Turn: Player 1", skin);
-        currentTurn.setPosition(20, Gdx.graphics.getHeight() - 40);
-
-        Table table = new Table();
-        table.top().left();
-        table.setFillParent(true);
-        table.add(currentTurn);
-
-        stage.addActor(table);
+        currentTurn = GameInitializer.initLabel();
+        stage = GameInitializer.initTurnUi(currentTurn);
 
     }
 
@@ -83,39 +53,13 @@ public class GameScreen implements Screen {
     public void show() {
 
         modelBatch = new ModelBatch();
-
-        env = new Environment();
-        env.set(new ColorAttribute(ColorAttribute.AmbientLight,.8f,.8f,.8f, 1f));
-        env.add(new DirectionalLight().set(1f, 1f, 1f, -1f, -0.8f, -0.2f));
-
-        camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        float centerx = (boardWidth * TileModel.getWidth()) / 2f - (TileModel.getWidth() / 2f);
-        float centerz = (boardHeight * TileModel.getHeight()) / 2f - (TileModel.getWidth() / 2f);
-
-        camera.position.set(centerx ,10f,-centerz);
-        camera.lookAt(centerx,0,centerz);
-        camera.up.set(0,0,1);
-        camera.near = .1f;
-        camera.far = 50f;
-        camera.update();
+        env = GameInitializer.initEnvironment();
+        camera = GameInitializer.initCamera(logic.boardRow, logic.boardCol);
 
         tiles = builder.build();
+        ArrayList <ArrayList<ModelInstance>> tileInstances = makeTileInstances();
 
-        ArrayList <ArrayList<ModelInstance>> tileInstances = new ArrayList<>();
-
-        for (ArrayList<Tile> tiles: tiles) {
-
-            ArrayList<ModelInstance> tile_row = new ArrayList<>();
-
-            for (Tile t : tiles) {
-                tile_row.add(t.tileInstance);
-            }
-
-            tileInstances.add(tile_row);
-        }
-
-        GameInput inputProcessor = new GameInput(camera, tileInstances, logic);
+        GameInput inputProcessor = new GameInput(camera, tileInstances, new InputHandler(logic));
         Gdx.input.setInputProcessor(inputProcessor);
 
     }
@@ -153,6 +97,24 @@ public class GameScreen implements Screen {
         modelBatch.dispose();
         stage.dispose();
 
+    }
+
+    private ArrayList<ArrayList<ModelInstance>> makeTileInstances() {
+
+        ArrayList <ArrayList<ModelInstance>> inst = new ArrayList<>();
+
+        for (ArrayList<Tile> tiles: tiles) {
+
+            ArrayList<ModelInstance> tile_row = new ArrayList<>();
+
+            for (Tile t : tiles) {
+                tile_row.add(t.tileInstance);
+            }
+
+            inst.add(tile_row);
+        }
+
+        return inst;
     }
 
     private ModelInstance renderPiece(Model m, Vector3 center) {
@@ -194,7 +156,6 @@ public class GameScreen implements Screen {
             }
         }
     }
-
 
     @Override
     public void pause() {}
