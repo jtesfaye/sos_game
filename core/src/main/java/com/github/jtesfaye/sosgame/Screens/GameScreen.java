@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 
+import com.github.jtesfaye.sosgame.GameLogic.Piece;
 import com.github.jtesfaye.sosgame.util.GameInit;
 import com.github.jtesfaye.sosgame.GameIO.GameInput;
 import com.github.jtesfaye.sosgame.GameIO.InputHandler;
@@ -18,6 +19,7 @@ import com.github.jtesfaye.sosgame.util.GameInitializer;
 import com.github.jtesfaye.sosgame.BoardComponents.oPieceModel;
 import com.github.jtesfaye.sosgame.BoardComponents.sPieceModel;
 import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
+import com.github.jtesfaye.sosgame.util.Pair;
 
 import java.util.ArrayList;
 
@@ -38,6 +40,8 @@ public class GameScreen implements Screen {
     private final Stage stage;
     private final Label currentTurn;
 
+    private final ArrayList<Pair<Piece, Vector3>> piecesToRender;
+
     public GameScreen(GameInit init) {
 
         logic = init.getLogic();
@@ -46,6 +50,7 @@ public class GameScreen implements Screen {
         op = new oPieceModel();
         currentTurn = GameInitializer.initLabel();
         stage = GameInitializer.initTurnUi(currentTurn);
+        piecesToRender = new ArrayList<>();
 
     }
 
@@ -74,8 +79,21 @@ public class GameScreen implements Screen {
 
         modelBatch.begin(camera);
 
-        updateBoard();
+        for (ArrayList<Tile> tile : tiles) {
+            for (Tile value : tile) {
+                ModelInstance inst = value.tileInstance;
+                modelBatch.render(inst, env);
+            }
+        }
+
+        updateState();
+
+        for (Pair<Piece, Vector3> piece : piecesToRender) {
+            modelBatch.render(renderPiece(piece.first, piece.second), env);
+        }
+
         modelBatch.end();
+
         stage.act(delta);
         stage.draw();
 
@@ -117,8 +135,9 @@ public class GameScreen implements Screen {
         return inst;
     }
 
-    private ModelInstance renderPiece(Model m, Vector3 center) {
+    private ModelInstance renderPiece(Piece piece, Vector3 center) {
 
+        Model m = piece.equals(Piece.sPiece) ? sp.getPieceModel() : op.getPieceModel();
         ModelInstance inst = new ModelInstance(m);
         inst.transform.setToTranslation(center).translate(0,0f,0f).scale(3f,3f,3f);
 
@@ -130,30 +149,23 @@ public class GameScreen implements Screen {
         currentTurn.setText("Current turn: " + logic.getCurrentTurn().toString());
     }
 
-    private void updateBoard() {
+    private void updateState() {
 
-        for (int row = 0; row < tiles.size(); row++) {
-            for (int col = 0; col < tiles.get(row).size(); col++) {
+        Pair<Pair<Integer, Integer>, Piece> placement = logic.getChanges();
 
-                ModelInstance inst = tiles.get(row).get(col).tileInstance;
-                Vector3 center = tiles.get(row).get(col).worldCenter;
-                modelBatch.render(inst, env);
+        if (placement != null) {
 
-                switch(logic.getPiece(row, col)) {
+            int row = placement.first.first;
+            int col = placement.first.second;
 
-                    case sPiece:
-                        modelBatch.render(renderPiece(sp.getPieceModel(), center));
-                        setCurrentPlayer();
-                        break;
-                    case oPiece:
-                        modelBatch.render(renderPiece(op.getPieceModel(), center));
-                        setCurrentPlayer();
-                        break;
-                    default:
-                        break;
+            Pair<Piece, Vector3> rend = new Pair<>(
+                placement.second,
+                tiles.get(row).get(col).worldCenter
+            );
 
-                }
-            }
+            piecesToRender.add(rend);
+
+            setCurrentPlayer();
         }
     }
 
