@@ -1,4 +1,4 @@
-package com.github.jtesfaye.sosgame.Components;
+package com.github.jtesfaye.sosgame.BoardComponents;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -10,16 +10,15 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 public class TileModel {
 
 
-    private final Model primaryTile;
-    private final Model secondaryTile;
+    private final Model tileModel;
     private static final int width = 3;
     private static final int height = 3;
 
-    public TileModel(Color primColor, Color secColor) {
+    public TileModel(Color primColor) {
 
         ModelBuilder builder = new ModelBuilder();
 
-        primaryTile = builder.createBox(
+        tileModel = builder.createBox(
             width,
             0.1f,
             height,
@@ -27,23 +26,10 @@ public class TileModel {
             VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
                 | VertexAttributes.Usage.TextureCoordinates
         );
-
-        secondaryTile = builder.createBox(
-            width,
-            0.1f,
-            height,
-            new Material(ColorAttribute.createDiffuse(secColor)),
-            VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
-                | VertexAttributes.Usage.TextureCoordinates
-        );
     }
 
-    public Model getPrimaryTile() {
-        return primaryTile;
-    }
-
-    public Model getSecondaryTile() {
-        return secondaryTile;
+    public Model getTileModel() {
+        return tileModel;
     }
 
     public static float getWidth() {return width;}

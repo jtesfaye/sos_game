@@ -5,33 +5,38 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import lombok.Getter;
 
 import java.util.ArrayList;
 
 
 public class BoardBuilder {
 
-    private final Model primaryTile;
-    private final Model secondaryTile;
+    private Model primaryTile;
+    private Model secondaryTile;
 
     private final BoardLayout layout;
 
     private final float width;
     private final float height;
 
+    @Getter
     ArrayList<Vector3> centers;
 
-    public BoardBuilder(float w, float h, Color p, Color s) {
+    public BoardBuilder(float w, float h) {
 
         width = w;
         height = h;
-        primaryTile = new TileModel(p).getTileModel();
-        secondaryTile = new TileModel(s).getTileModel();
+        primaryTile = null;
+        secondaryTile = null;
         layout = new BoardLayout(w, h, TileModel.getWidth(), TileModel.getHeight());
 
     }
 
-    public ArrayList<ArrayList<Tile>> build() {
+    public ArrayList<ArrayList<Tile>> build(Color p, Color s) {
+
+        primaryTile = new TileModel(p).getTileModel();
+        secondaryTile = new TileModel(s).getTileModel();
 
         ArrayList<ArrayList<Tile>> tiles = new ArrayList<>();
         centers = layout.getCenters();
@@ -67,8 +72,4 @@ public class BoardBuilder {
         return tiles;
     }
 
-    public ArrayList<Vector3> getCenters() {
-
-        return centers;
-    }
 }
