@@ -6,7 +6,7 @@ import com.github.jtesfaye.sosgame.BoardComponents.BoardLayout;
 import com.github.jtesfaye.sosgame.BoardComponents.TileModel;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BoardLayoutTest {
 
@@ -40,6 +40,7 @@ public class BoardLayoutTest {
                     break;
                 }
             }
+
             assertTrue(flag, "The distance between the tile centers should be equal.");
         }
     }
