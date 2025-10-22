@@ -11,5 +11,6 @@ public class GameInit {
     int boardHeight;
     GameLogic logic;
     BoardBuilder builder;
+    String gameMode;
 
 }
