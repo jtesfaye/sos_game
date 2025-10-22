@@ -14,12 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
-import com.github.jtesfaye.sosgame.BoardComponents.Tile;
 import com.github.jtesfaye.sosgame.BoardComponents.TileModel;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 
-import lombok.Value;
 
 import java.util.ArrayList;
 
@@ -38,13 +36,13 @@ public class GameInitializer {
 
         GameLogic logic = GameLogicFactory.createGameLogic(width, height, gameMode);
 
-        BoardBuilder builder = new BoardBuilder(width, height, Color.CHARTREUSE, Color.RED);
+        BoardBuilder builder = new BoardBuilder(width, height);
 
-        return new GameInit(width, height, logic, builder);
+        return new GameInit(width, height, logic, builder, gameMode);
 
     }
 
-    public static Stage initTurnUi(Label turn) {
+    public static Stage initTurnUi(Label turn, Label gameMode) {
 
         SpriteBatch batch = new SpriteBatch();
         Stage stage = new Stage(new ScreenViewport(), batch);
@@ -52,6 +50,9 @@ public class GameInitializer {
         Table table = new Table();
         table.top().left();
         table.setFillParent(true);
+        table.add(gameMode);
+        table.row();
+
         table.add(turn);
 
         stage.addActor(table);;
@@ -59,13 +60,21 @@ public class GameInitializer {
         return stage;
     }
 
-    public static Label initLabel() {
+    public static Label initPlayerLabel(Skin skin) {
 
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
         Label currentTurn = new Label("Current Turn: Player 1", skin);
         currentTurn.setPosition(20, Gdx.graphics.getHeight() - 40);
 
         return  currentTurn;
+
+    }
+
+    public static Label initGameModeLabel(String gameMode, Skin skin) {
+
+        Label gameModeLabel = new Label("Game Mode: " + gameMode + "      ", skin);
+        gameModeLabel.setPosition(20, Gdx.graphics.getHeight() - 40);
+
+        return gameModeLabel;
 
     }
 

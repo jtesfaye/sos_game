@@ -2,6 +2,7 @@ package com.github.jtesfaye.sosgame.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.GL20;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.github.jtesfaye.sosgame.GameLogic.Piece;
 import com.github.jtesfaye.sosgame.util.GameInit;
 import com.github.jtesfaye.sosgame.GameIO.GameInput;
@@ -37,7 +39,7 @@ public class GameScreen implements Screen {
 
     private ArrayList<ArrayList<Tile>> tiles;
 
-    private final Stage stage;
+    private final Stage gameOverlay;
     private final Label currentTurn;
 
     private final ArrayList<Pair<Piece, Vector3>> piecesToRender;
@@ -48,8 +50,11 @@ public class GameScreen implements Screen {
         builder = init.getBuilder();
         sp = new sPieceModel();
         op = new oPieceModel();
-        currentTurn = GameInitializer.initLabel();
-        stage = GameInitializer.initTurnUi(currentTurn);
+        currentTurn = GameInitializer.initPlayerLabel(new Skin(Gdx.files.internal("uiskin.json")));
+        gameOverlay = GameInitializer.initTurnUi(
+            currentTurn,
+            GameInitializer.initGameModeLabel(init.getGameMode(), new Skin(Gdx.files.internal("uiskin.json")))
+        );
         piecesToRender = new ArrayList<>();
 
     }
@@ -61,7 +66,7 @@ public class GameScreen implements Screen {
         env = GameInitializer.initEnvironment();
         camera = GameInitializer.initCamera(logic.boardRow, logic.boardCol);
 
-        tiles = builder.build();
+        tiles = builder.build(Color.CHARTREUSE, Color.RED);
         ArrayList <ArrayList<ModelInstance>> tileInstances = makeTileInstances();
 
         GameInput inputProcessor = new GameInput(camera, tileInstances, new InputHandler(logic));
@@ -94,8 +99,8 @@ public class GameScreen implements Screen {
 
         modelBatch.end();
 
-        stage.act(delta);
-        stage.draw();
+        gameOverlay.act(delta);
+        gameOverlay.draw();
 
     }
 
@@ -105,7 +110,7 @@ public class GameScreen implements Screen {
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
-        stage.getViewport().update(width, height, true);
+        gameOverlay.getViewport().update(width, height, true);
 
     }
 
@@ -113,7 +118,7 @@ public class GameScreen implements Screen {
     public void dispose() {
 
         modelBatch.dispose();
-        stage.dispose();
+        gameOverlay.dispose();
 
     }
 
@@ -146,7 +151,7 @@ public class GameScreen implements Screen {
     }
 
     private void setCurrentPlayer() {
-        currentTurn.setText("Current turn: " + logic.getCurrentTurn().toString());
+        currentTurn.setText("Current turn: " + logic.getCurrentTurn().toString() );
     }
 
     private void updateState() {

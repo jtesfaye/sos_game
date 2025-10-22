@@ -9,57 +9,28 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.github.jtesfaye.sosgame.util.GameInitializer;
+import com.github.jtesfaye.sosgame.util.MenuInitializer;
 
 public class MainMenuScreen implements Screen {
 
-    private Stage stage;
-    private Skin skin;
+    private final Stage stage;
 
     public MainMenuScreen(Game game) {
 
-        stage = new Stage(new ScreenViewport());
+        MenuInitializer menu = new MenuInitializer();
+        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        stage = menu.createStage(skin);
 
-        Table table = new Table();
-        table.setFillParent(true);
-        stage.addActor(table);
-
-        Label title = new Label("SOS", skin);
-        table.add(title).colspan(2).padBottom(20);
-        table.row();
-
-        Label boardLabel = new Label("Board Size:", skin);
-        SelectBox<String> boardSizeSelect = new SelectBox<>(skin);
-        boardSizeSelect.setItems("3x3", "4x4", "5x5","6x6", "7x7", "8x8","9x9");
-
-        table.add(boardLabel).padRight(10);
-        table.add(boardSizeSelect).padBottom(15);
-        table.row();
-
-        Label modeLabel = new Label("Game Mode:", skin);
-        SelectBox<String> modeSelect = new SelectBox<>(skin);
-        modeSelect.setItems("General", "Simple");
-
-        table.add(modeLabel).padRight(10);
-        table.add(modeSelect).padBottom(15);
-        table.row();
-
-        TextButton startButton = new TextButton("Start game", skin);
-
-        startButton.addListener(new ChangeListener() {
+        menu.getStartButton().addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String sizeSelected = boardSizeSelect.getSelected();
-                String modeSelected = modeSelect.getSelected();
-
-                game.setScreen(new GameScreen(sizeSelected, modeSelected));
-
-
+                String sizeSelected = menu.getBoardSizeChoice().getSelected();
+                String modeSelected = menu.getModeChoice().getSelected();
+                game.setScreen(new GameScreen(GameInitializer.initGame(sizeSelected, modeSelected)));
             }
         });
-
-        table.add(startButton).colspan(2).padTop(20);
 
         Gdx.input.setInputProcessor(stage);
 
