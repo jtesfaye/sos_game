@@ -13,9 +13,9 @@ public class GameLogicFactory {
 
             return createGeneralGameLogic(row, height);
 
+        } else {
+            throw new RuntimeException("Invalid game mode as argument");
         }
-
-        return null;
     }
 
     private static SimpleGameLogic createSimpleGameLogic(int r, int h) {

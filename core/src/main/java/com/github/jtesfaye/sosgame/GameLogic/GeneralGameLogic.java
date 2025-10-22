@@ -1,6 +1,6 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
-public class GeneralGameLogic extends GameLogic{
+class GeneralGameLogic extends GameLogic{
 
     GeneralGameLogic(int r, int h) {
         super(r, h);
@@ -9,26 +9,23 @@ public class GeneralGameLogic extends GameLogic{
     @Override
     public boolean isWinner() {
 
-        //General games continue until the board is full, therefore no winner if capacity > 0
-        if (this.capacity > 0 ) {
-            return false;
-        }
-
-        return Math.max(this.player1SOSCount, this.computerSOSCount) > 0;
-
+        return this.capacity <= 0;
     }
 
     @Override
-    public Player getWinner() {
+    protected void checkSOS(int r, int c) {
 
-        if (this.player1SOSCount == 1) {
+        int count = 0;
 
-            return Player.Player1;
+        if (checker.isDiagonal(r,c))
+            count += 1;
 
-        } else {
+        if (checker.isHorizontal(r,c))
+            count += 1;
 
-            return Player.Computer;
+        if (checker.isVertical(r,c))
+            count += 1;
 
-        }
+        scoreArr[currentTurn.ordinal()] += count;
     }
 }

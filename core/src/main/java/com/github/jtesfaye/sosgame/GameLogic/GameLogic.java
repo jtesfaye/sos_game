@@ -69,10 +69,11 @@ public abstract class GameLogic {
 
     public boolean setPiece(int r, int c, Piece piece) {
 
-        appendBoard(r,c,piece);
-        checkSOS(r,c);
-        changeQueue.add(new Pair<>(new Pair<>(r,c), piece));
-        nextTurn();
+        if (appendBoard(r,c,piece)) {
+            changeQueue.add(new Pair<>(new Pair<>(r,c), piece));
+            checkSOS(r,c);
+            nextTurn();
+        }
 
         return isWinner();
     }

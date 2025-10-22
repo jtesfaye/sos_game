@@ -1,6 +1,9 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
-public class SimpleGameLogic extends GameLogic {
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
+class SimpleGameLogic extends GameLogic {
 
     SimpleGameLogic(int r, int h) {
         super(r, h);
@@ -9,20 +12,15 @@ public class SimpleGameLogic extends GameLogic {
     @Override
     public boolean isWinner() {
 
-        return Math.max(this.player1SOSCount, this.computerSOSCount) > 0;
-
+        return Arrays.stream(scoreArr).sum() > 0;
     }
 
     @Override
-    public Player getWinner() {
+    protected void checkSOS(int r, int c) {
 
-        if (this.player1SOSCount == 1) {
+        if (checker.isDiagonal(r, c) || checker.isHorizontal(r,c) || checker.isVertical(r, c)) {
 
-            return Player.Player1;
-
-        } else {
-
-            return Player.Computer;
+            scoreArr[currentTurn.ordinal()] += 1;
 
         }
     }
