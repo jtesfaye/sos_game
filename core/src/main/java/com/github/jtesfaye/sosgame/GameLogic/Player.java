@@ -1,12 +1,11 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
-public enum Player {
-
-    Player1("Player 1"), Player2("Player 2");
+public class Player {
 
     final String description;
 
-    Player(String desc) {
+    public Player(String desc) {
+
         description = desc;
     }
 

@@ -5,8 +5,8 @@ import java.util.stream.IntStream;
 
 class SimpleGameLogic extends GameLogic {
 
-    SimpleGameLogic(int r, int h) {
-        super(r, h);
+    SimpleGameLogic(int r, int h, String opponent) {
+        super(r, h, opponent);
     }
 
     @Override
@@ -20,7 +20,7 @@ class SimpleGameLogic extends GameLogic {
 
         if (checker.isDiagonal(r, c) || checker.isHorizontal(r,c) || checker.isVertical(r, c)) {
 
-            scoreArr[currentTurn.ordinal()] += 1;
+            scoreArr[currentTurn] += 1;
 
         }
     }

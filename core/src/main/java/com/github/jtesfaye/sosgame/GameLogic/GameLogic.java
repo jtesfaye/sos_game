@@ -11,8 +11,11 @@ import java.util.stream.IntStream;
 
 public abstract class GameLogic {
 
+    protected int currentTurn;
+    Player[] players;
+
     @Getter
-    protected Player currentTurn;
+    int[] scoreArr; //Keeps track of SOS count for each player
 
     public int boardRow;
     public int boardCol;
@@ -20,7 +23,6 @@ public abstract class GameLogic {
 
     protected final Piece[][] board;
     protected final SOSChecker checker;
-    int[] scoreArr; //Keeps track of SOS count for each player
 
     private final Queue<Pair<Pair<Integer, Integer>, Piece>> changeQueue;
 
@@ -31,12 +33,31 @@ public abstract class GameLogic {
      */
     public abstract boolean isWinner();
 
-    protected GameLogic(int r, int c) {
+    protected GameLogic(int r, int c, String opponentType) {
 
         boardRow = r;
         boardCol = c;
         capacity = r * c;
-        currentTurn = Player.Player1;
+
+        players = new Player[2];
+
+        players[0] = new Player("Player 1");
+
+        switch (opponentType) {
+            case "Human":
+                players[1] = new Player("Player 2");
+                break;
+            case "Computer":
+                players[1] = new Player("Computer");
+                break;
+            case "LLM":
+                players[1] = new Player("LLM");
+                break;
+            default:
+                throw new RuntimeException("Invalid opponent type");
+        }
+
+        currentTurn = 0;
 
         board = new Piece[r][c];
 
@@ -49,7 +70,7 @@ public abstract class GameLogic {
 
         changeQueue = new ArrayDeque<>();
 
-        scoreArr = new int[Player.values().length];
+        scoreArr = new int[players.length];
 
         checker = new SOSChecker(board);
     }
@@ -64,7 +85,7 @@ public abstract class GameLogic {
             .reduce((i, j) -> scoreArr[i] > scoreArr[j] ? i : j)
             .orElse(-1);
 
-        return Player.values()[max];
+        return players[max];
     }
 
     public boolean setPiece(int r, int c, Piece piece) {
@@ -80,13 +101,13 @@ public abstract class GameLogic {
 
     protected void nextTurn() {
 
-        int numPlayers = Player.values().length;
-        int val = currentTurn.ordinal();
+        int numPlayers = players.length;
+        int val = currentTurn;
 
         val += 1;
         val = val % numPlayers;
 
-        currentTurn = Player.values()[val];
+        currentTurn = val;
     }
 
     public boolean isOpen(int r, int c) {
@@ -107,8 +128,26 @@ public abstract class GameLogic {
         return board[r][c];
     }
 
+    public Player getCurrentTurn() {
+        return players[currentTurn];
+    }
+
     public Pair<Pair<Integer, Integer>, Piece> getChanges() {
+
         return changeQueue.poll();
+    }
+
+    public ArrayList<Pair<String, String>> getScores() {
+
+        ArrayList<Pair<String, String>> arr = new ArrayList<>();
+
+        for (int i = 0; i < scoreArr.length; i++) {
+
+            arr.add(new Pair<>(players[i].toString(), Integer.toString(scoreArr[i])));
+
+        }
+
+        return arr;
     }
 
     protected boolean appendBoard(int r, int c, Piece piece) {
@@ -121,5 +160,8 @@ public abstract class GameLogic {
         capacity += 1;
         return true;
     }
+
+
+
 
 }
