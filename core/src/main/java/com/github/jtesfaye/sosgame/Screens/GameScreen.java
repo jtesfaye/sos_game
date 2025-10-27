@@ -40,7 +40,8 @@ public class GameScreen implements Screen {
     private ArrayList<ArrayList<Tile>> tiles;
 
     private final Stage gameOverlay;
-    private final Label currentTurn;
+    private final Label currentTurnLabel;
+    private final Label currentScoreLabel;
 
     private final ArrayList<Pair<Piece, Vector3>> piecesToRender;
 
@@ -48,12 +49,18 @@ public class GameScreen implements Screen {
 
         logic = init.getLogic();
         builder = init.getBuilder();
-        sp = new sPieceModel();
-        op = new oPieceModel();
-        currentTurn = GameInitializer.initPlayerLabel(new Skin(Gdx.files.internal("uiskin.json")));
+        sp = new sPieceModel(Color.GREEN);
+        op = new oPieceModel(Color.GREEN);
+
+        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        currentScoreLabel = GameInitializer.initScoreTableLabel(init.getOpponentType(), skin);
+        currentTurnLabel = GameInitializer.initPlayerLabel(skin);
         gameOverlay = GameInitializer.initTurnUi(
-            currentTurn,
-            GameInitializer.initGameModeLabel(init.getGameMode(), new Skin(Gdx.files.internal("uiskin.json")))
+            currentTurnLabel,
+            GameInitializer.initGameModeLabel(
+                init.getGameMode(),
+                skin),
+            currentScoreLabel
         );
         piecesToRender = new ArrayList<>();
 
@@ -151,7 +158,21 @@ public class GameScreen implements Screen {
     }
 
     private void setCurrentPlayer() {
-        currentTurn.setText("Current turn: " + logic.getCurrentTurn().toString() );
+        currentTurnLabel.setText("Current turn: " + logic.getCurrentTurn().toString() );
+    }
+
+    private void updateScore() {
+
+        StringBuilder score = new StringBuilder("Current Score:\n");
+        ArrayList<Pair<String, String>> scores = logic.getScores();
+        for (Pair<String, String> item : scores) {
+
+            score.append(item.first).append(": ").append(item.second).append("  ");
+
+        }
+
+        currentScoreLabel.setText(score);
+
     }
 
     private void updateState() {
@@ -169,6 +190,7 @@ public class GameScreen implements Screen {
             );
 
             piecesToRender.add(rend);
+            updateScore();
 
             setCurrentPlayer();
         }

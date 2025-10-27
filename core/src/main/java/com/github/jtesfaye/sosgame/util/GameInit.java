@@ -6,11 +6,10 @@ import lombok.Value;
 
 @Value
 public class GameInit {
-
     int boardWidth;
     int boardHeight;
     GameLogic logic;
     BoardBuilder builder;
     String gameMode;
-
+    String opponentType;
 }

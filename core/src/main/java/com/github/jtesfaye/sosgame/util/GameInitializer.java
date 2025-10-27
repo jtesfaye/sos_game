@@ -21,28 +21,27 @@ import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 
 import java.util.ArrayList;
 
-
 public class GameInitializer {
 
     private static int width;
     private static int height;
 
-    public static GameInit initGame(String boardSize, String gameMode) {
+    public static GameInit initGame(String boardSize, String gameMode, String opponent) {
 
         Pair<Integer, Integer> dimensions = utilFunctions.getBoardDimensions(boardSize);
 
         width = dimensions.first;
         height = dimensions.second;
 
-        GameLogic logic = GameLogicFactory.createGameLogic(width, height, gameMode);
+        GameLogic logic = GameLogicFactory.createGameLogic(width, height, gameMode, opponent);
 
         BoardBuilder builder = new BoardBuilder(width, height);
 
-        return new GameInit(width, height, logic, builder, gameMode);
+        return new GameInit(width, height, logic, builder, gameMode, opponent);
 
     }
 
-    public static Stage initTurnUi(Label turn, Label gameMode) {
+    public static Stage initTurnUi(Label turn, Label gameMode, Label currentScore) {
 
         SpriteBatch batch = new SpriteBatch();
         Stage stage = new Stage(new ScreenViewport(), batch);
@@ -52,10 +51,12 @@ public class GameInitializer {
         table.setFillParent(true);
         table.add(gameMode);
         table.row();
+        table.add(currentScore);
+        table.row();
 
         table.add(turn);
 
-        stage.addActor(table);;
+        stage.addActor(table);
 
         return stage;
     }
@@ -75,6 +76,16 @@ public class GameInitializer {
         gameModeLabel.setPosition(20, Gdx.graphics.getHeight() - 40);
 
         return gameModeLabel;
+
+    }
+
+    public static Label initScoreTableLabel(String opponent, Skin skin) {
+
+        String o = opponent + ": 0";
+        Label scoreTable = new Label("Current score: \nPlayer 1: 0  " + o, skin);
+        scoreTable.setPosition(20, Gdx.graphics.getHeight() - 40);
+
+        return scoreTable;
 
     }
 

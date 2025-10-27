@@ -16,6 +16,9 @@ public class MenuInitializer {
     @Getter
     private SelectBox<String> modeChoice;
 
+    @Getter
+    private SelectBox<String> opponentChoice;
+
     public Stage createStage(Skin skin) {
 
         Stage stage = new Stage(new ScreenViewport());
@@ -33,10 +36,16 @@ public class MenuInitializer {
         table.add(boardSizeChoice).padBottom(15);
         table.row();
 
-        table.add(initBoardSizeLabel(skin)).padRight(10);
+        table.add(initGameModeLabel(skin)).padRight(10);
         modeChoice = new SelectBox<>(skin);
         modeChoice.setItems("General", "Simple");
         table.add(modeChoice).padBottom(15);
+        table.row();
+
+        table.add(initOpponentTypeLabel(skin)).padRight(10);
+        opponentChoice = new SelectBox<>(skin);
+        opponentChoice.setItems("Human", "Computer", "LLM");
+        table.add(opponentChoice).padBottom(15);
         table.row();
 
         startButton = new TextButton("Start game", skin);
@@ -44,26 +53,22 @@ public class MenuInitializer {
         table.add(startButton).colspan(2).padTop(20);
 
         return stage;
-
     }
 
     private Label initTitle(Skin skin) {
-
         return new Label("SOS", skin);
-
     }
 
     private Label initBoardSizeLabel(Skin skin) {
-
         return new Label("Board Size:", skin);
     }
 
     private Label initGameModeLabel(Skin skin) {
-
         return new Label("Game Mode:", skin);
-
     }
 
-
+    private Label initOpponentTypeLabel(Skin skin) {
+        return new Label("Select opponent: ", skin);
+    }
 
 }
