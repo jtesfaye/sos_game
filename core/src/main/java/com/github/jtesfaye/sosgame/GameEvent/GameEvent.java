@@ -5,7 +5,7 @@ import lombok.Getter;
 public abstract class GameEvent {
 
     public enum EventType {
-        PieceSet, //Tell screen to render a S or O
+        PieceSet, //Tell screen to render an S or O
         SOSMade, //Tell screen to render a line over a newly made SOS
         DeclareWinner, //End game declaring who won and who lost
     };
