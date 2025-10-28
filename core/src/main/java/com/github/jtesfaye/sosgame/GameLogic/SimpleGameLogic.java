@@ -1,5 +1,7 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
+import com.github.jtesfaye.sosgame.GameEvent.SOSMadeEvent;
+
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -16,12 +18,29 @@ class SimpleGameLogic extends GameLogic {
     }
 
     @Override
-    protected void checkSOS(int r, int c) {
+    protected boolean checkSOS(int r, int c) {
 
-        if (checker.isDiagonal(r, c) || checker.isHorizontal(r,c) || checker.isVertical(r, c)) {
 
+        SOSMadeEvent event;
+
+        if ((event = checker.checkDiagonal(r, c, getCurrentTurn())) != null) {
             scoreArr[currentTurn] += 1;
-
+            this.eventQueue.add(event);
+            return true;
         }
+
+        if ((event = checker.checkHorizontal(r, c, getCurrentTurn())) != null) {
+            scoreArr[currentTurn] += 1;
+            this.eventQueue.add(event);
+            return true;
+        }
+
+        if ((event = checker.checkVertical(r, c, getCurrentTurn())) != null) {
+            scoreArr[currentTurn] += 1;
+            this.eventQueue.add(event);
+            return true;
+        }
+
+        return false;
     }
 }

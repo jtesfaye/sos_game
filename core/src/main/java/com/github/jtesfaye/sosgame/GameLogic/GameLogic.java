@@ -1,5 +1,9 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
+import com.badlogic.gdx.graphics.Color;
+import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
+import com.github.jtesfaye.sosgame.GameEvent.PieceSetEvent;
+import com.github.jtesfaye.sosgame.GameEvent.WinnerEvent;
 import com.github.jtesfaye.sosgame.util.Pair;
 import lombok.Getter;
 
@@ -24,9 +28,9 @@ public abstract class GameLogic {
     protected final Piece[][] board;
     protected final SOSChecker checker;
 
-    private final Queue<Pair<Pair<Integer, Integer>, Piece>> changeQueue;
+    protected final Queue<GameEvent> eventQueue;
 
-    protected abstract void checkSOS(int r, int c);
+    protected abstract boolean checkSOS(int r, int c);
 
     /**
      * This function checks if there is a winner. It does not determine who the winner is.
@@ -41,17 +45,19 @@ public abstract class GameLogic {
 
         players = new Player[2];
 
-        players[0] = new Player("Player 1");
+        players[0] = new Player("Player 1", Color.BLUE);
 
+        Color oppColor = Color.RED;
         switch (opponentType) {
+
             case "Human":
-                players[1] = new Player("Player 2");
+                players[1] = new Player("Player 2", oppColor);
                 break;
             case "Computer":
-                players[1] = new Player("Computer");
+                players[1] = new Player("Computer", oppColor);
                 break;
             case "LLM":
-                players[1] = new Player("LLM");
+                players[1] = new Player("LLM", oppColor);
                 break;
             default:
                 throw new RuntimeException("Invalid opponent type");
@@ -68,7 +74,7 @@ public abstract class GameLogic {
             }
         }
 
-        changeQueue = new ArrayDeque<>();
+        eventQueue = new ArrayDeque<>();
 
         scoreArr = new int[players.length];
 
@@ -80,23 +86,28 @@ public abstract class GameLogic {
      */
     public Player getWinner() {
 
-        int max = IntStream
+        int index = IntStream
             .range(0, scoreArr.length)
             .reduce((i, j) -> scoreArr[i] > scoreArr[j] ? i : j)
             .orElse(-1);
 
-        return players[max];
+        System.out.printf("The winnder is %s\n", players[index].toString());
+
+        return players[index];
     }
 
-    public boolean setPiece(int r, int c, Piece piece) {
+    public void setPiece(int r, int c, Piece piece) {
 
         if (appendBoard(r,c,piece)) {
-            changeQueue.add(new Pair<>(new Pair<>(r,c), piece));
-            checkSOS(r,c);
+            eventQueue.add(new PieceSetEvent(r, c, piece));
+
+            if (checkSOS(r,c) && isWinner()) {
+                eventQueue.add(new WinnerEvent(getWinner()));
+                return;
+            }
+
             nextTurn();
         }
-
-        return isWinner();
     }
 
     protected void nextTurn() {
@@ -132,9 +143,9 @@ public abstract class GameLogic {
         return players[currentTurn];
     }
 
-    public Pair<Pair<Integer, Integer>, Piece> getChanges() {
+    public GameEvent getChanges() {
 
-        return changeQueue.poll();
+        return eventQueue.poll();
     }
 
     public ArrayList<Pair<String, String>> getScores() {
@@ -150,6 +161,10 @@ public abstract class GameLogic {
         return arr;
     }
 
+    public String getOpponentName() {
+        return players[1].toString();
+    }
+
     protected boolean appendBoard(int r, int c, Piece piece) {
 
         if (!isOpen(r, c))
@@ -157,11 +172,7 @@ public abstract class GameLogic {
 
         board[r][c] = piece;
 
-        capacity += 1;
+        capacity -= 1;
         return true;
     }
-
-
-
-
 }

@@ -1,12 +1,19 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
+import com.badlogic.gdx.graphics.Color;
+import lombok.Getter;
+
 public class Player {
 
     final String description;
 
-    public Player(String desc) {
+    @Getter
+    Color playerColor;
+
+    public Player(String desc, Color color) {
 
         description = desc;
+        playerColor = color;
     }
 
     @Override
