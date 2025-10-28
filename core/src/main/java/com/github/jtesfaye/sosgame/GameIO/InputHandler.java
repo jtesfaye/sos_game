@@ -16,7 +16,8 @@ public class InputHandler {
     public boolean handleClick(int row, int col, boolean isLeft) {
 
         Piece piece = isLeft ? Piece.sPiece : Piece.oPiece;
-        return logic.setPiece(row, col, piece);
+        logic.setPiece(row, col, piece);
+        return true;
 
     }
 }

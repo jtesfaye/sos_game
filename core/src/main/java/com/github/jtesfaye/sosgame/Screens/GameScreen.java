@@ -11,16 +11,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.github.jtesfaye.sosgame.BoardComponents.*;
+import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
+import com.github.jtesfaye.sosgame.GameEvent.PieceSetEvent;
+import com.github.jtesfaye.sosgame.GameEvent.SOSMadeEvent;
 import com.github.jtesfaye.sosgame.GameLogic.Piece;
 import com.github.jtesfaye.sosgame.util.GameInit;
 import com.github.jtesfaye.sosgame.GameIO.GameInput;
 import com.github.jtesfaye.sosgame.GameIO.InputHandler;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
-import com.github.jtesfaye.sosgame.BoardComponents.Tile;
 import com.github.jtesfaye.sosgame.util.GameInitializer;
-import com.github.jtesfaye.sosgame.BoardComponents.oPieceModel;
-import com.github.jtesfaye.sosgame.BoardComponents.sPieceModel;
-import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
 import com.github.jtesfaye.sosgame.util.Pair;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class GameScreen implements Screen {
     private final Label currentTurnLabel;
     private final Label currentScoreLabel;
 
-    private final ArrayList<Pair<Piece, Vector3>> piecesToRender;
+    private final ArrayList<ModelInstance> modelsToRender;
 
     public GameScreen(GameInit init) {
 
@@ -53,16 +53,17 @@ public class GameScreen implements Screen {
         op = new oPieceModel(Color.GREEN);
 
         Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
-        currentScoreLabel = GameInitializer.initScoreTableLabel(init.getOpponentType(), skin);
+
+        currentScoreLabel = GameInitializer.initScoreTableLabel(logic.getOpponentName(), skin);
         currentTurnLabel = GameInitializer.initPlayerLabel(skin);
+
         gameOverlay = GameInitializer.initTurnUi(
             currentTurnLabel,
-            GameInitializer.initGameModeLabel(
-                init.getGameMode(),
-                skin),
+            GameInitializer.initGameModeLabel(init.getGameMode(), skin),
             currentScoreLabel
         );
-        piecesToRender = new ArrayList<>();
+
+        modelsToRender = new ArrayList<>();
 
     }
 
@@ -73,7 +74,7 @@ public class GameScreen implements Screen {
         env = GameInitializer.initEnvironment();
         camera = GameInitializer.initCamera(logic.boardRow, logic.boardCol);
 
-        tiles = builder.build(Color.CHARTREUSE, Color.RED);
+        tiles = builder.build(Color.WHITE, Color.GRAY);
         ArrayList <ArrayList<ModelInstance>> tileInstances = makeTileInstances();
 
         GameInput inputProcessor = new GameInput(camera, tileInstances, new InputHandler(logic));
@@ -100,8 +101,8 @@ public class GameScreen implements Screen {
 
         updateState();
 
-        for (Pair<Piece, Vector3> piece : piecesToRender) {
-            modelBatch.render(renderPiece(piece.first, piece.second), env);
+        for (ModelInstance model : modelsToRender) {
+            modelBatch.render(model, env);
         }
 
         modelBatch.end();
@@ -158,7 +159,8 @@ public class GameScreen implements Screen {
     }
 
     private void setCurrentPlayer() {
-        currentTurnLabel.setText("Current turn: " + logic.getCurrentTurn().toString() );
+
+        currentTurnLabel.setText("Current turn: " + logic.getCurrentTurn().toString());
     }
 
     private void updateScore() {
@@ -177,22 +179,41 @@ public class GameScreen implements Screen {
 
     private void updateState() {
 
-        Pair<Pair<Integer, Integer>, Piece> placement = logic.getChanges();
+        GameEvent event = logic.getChanges();
 
-        if (placement != null) {
+        if (event == null) {
+            return;
+        }
 
-            int row = placement.first.first;
-            int col = placement.first.second;
+        if (event.getEvent().equals(GameEvent.EventType.PieceSet)) {
 
-            Pair<Piece, Vector3> rend = new Pair<>(
-                placement.second,
-                tiles.get(row).get(col).worldCenter
-            );
+            assert event instanceof PieceSetEvent;
+            PieceSetEvent e = (PieceSetEvent) event;
 
-            piecesToRender.add(rend);
+            int row = e.row;
+            int col = e.col;
+            Piece p = e.piece;
+
+            Vector3 center = tiles.get(row).get(col).worldCenter;
+
+            modelsToRender.add(renderPiece(p, center));
             updateScore();
 
             setCurrentPlayer();
+
+        }
+
+        if (event.getEvent().equals(GameEvent.EventType.SOSMade)) {
+
+            assert event instanceof SOSMadeEvent;
+            SOSMadeEvent e = (SOSMadeEvent) event;
+
+            Vector3 start = tiles.get(e.row1).get(e.col1).worldCenter;
+            Vector3 middle = tiles.get(e.row2).get(e.col2).worldCenter;
+            Vector3 end = tiles.get(e.row3).get(e.col3).worldCenter;
+
+            modelsToRender.add(SOSSlashModel.SOSSlashInstance(start, middle, end, e.color));
+
         }
     }
 

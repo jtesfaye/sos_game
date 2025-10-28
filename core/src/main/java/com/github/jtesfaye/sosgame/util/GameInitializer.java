@@ -37,7 +37,7 @@ public class GameInitializer {
 
         BoardBuilder builder = new BoardBuilder(width, height);
 
-        return new GameInit(width, height, logic, builder, gameMode, opponent);
+        return new GameInit(width, height, logic, builder, gameMode, logic.getOpponentName());
 
     }
 
@@ -76,7 +76,6 @@ public class GameInitializer {
         gameModeLabel.setPosition(20, Gdx.graphics.getHeight() - 40);
 
         return gameModeLabel;
-
     }
 
     public static Label initScoreTableLabel(String opponent, Skin skin) {
@@ -86,7 +85,6 @@ public class GameInitializer {
         scoreTable.setPosition(20, Gdx.graphics.getHeight() - 40);
 
         return scoreTable;
-
     }
 
     public static Environment initEnvironment() {
@@ -115,5 +113,4 @@ public class GameInitializer {
         return camera;
 
     }
-
 }
