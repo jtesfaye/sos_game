@@ -8,6 +8,7 @@ public abstract class GameEvent {
         PieceSet, //Tell screen to render an S or O
         SOSMade, //Tell screen to render a line over a newly made SOS
         DeclareWinner, //End game declaring who won and who lost
+        Tie
     };
 
     @Getter
