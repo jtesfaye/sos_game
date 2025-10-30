@@ -3,18 +3,23 @@ package com.github.jtesfaye.sosgame.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.BoardComponents.*;
-import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
-import com.github.jtesfaye.sosgame.GameEvent.PieceSetEvent;
-import com.github.jtesfaye.sosgame.GameEvent.SOSMadeEvent;
+import com.github.jtesfaye.sosgame.GameEvent.*;
 import com.github.jtesfaye.sosgame.GameLogic.Piece;
 import com.github.jtesfaye.sosgame.util.GameInit;
 import com.github.jtesfaye.sosgame.GameIO.GameInput;
@@ -37,6 +42,9 @@ public class GameScreen implements Screen {
 
     private final GameLogic logic;
 
+    private boolean gameOver;
+    private String endGameMessage;
+
     private ArrayList<ArrayList<Tile>> tiles;
 
     private final Stage gameOverlay;
@@ -47,6 +55,7 @@ public class GameScreen implements Screen {
 
     public GameScreen(GameInit init) {
 
+        gameOver = false;
         logic = init.getLogic();
         builder = init.getBuilder();
         sp = new sPieceModel(Color.GREEN);
@@ -107,6 +116,10 @@ public class GameScreen implements Screen {
 
         modelBatch.end();
 
+        if (gameOver) {
+            renderEndGame(endGameMessage);
+        }
+
         gameOverlay.act(delta);
         gameOverlay.draw();
 
@@ -158,6 +171,33 @@ public class GameScreen implements Screen {
 
     }
 
+    private void renderEndGame(String winnerMessage) {
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 0, 0, 0.5f);
+        shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        shapeRenderer.end();
+
+        SpriteBatch batch = new SpriteBatch();
+
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(2f);
+        font.setColor(Color.WHITE);
+
+        batch.begin();
+        font.draw(batch, winnerMessage,
+            Gdx.graphics.getWidth() / 2f - 100,
+            Gdx.graphics.getHeight() / 2f + 20);
+        batch.end();
+
+        gameOverlay.draw();
+
+    }
+
     private void setCurrentPlayer() {
 
         currentTurnLabel.setText("Current turn: " + logic.getCurrentTurn().toString());
@@ -185,9 +225,8 @@ public class GameScreen implements Screen {
             return;
         }
 
-        if (event.getEvent().equals(GameEvent.EventType.PieceSet)) {
+        if (event instanceof PieceSetEvent) {
 
-            assert event instanceof PieceSetEvent;
             PieceSetEvent e = (PieceSetEvent) event;
 
             int row = e.row;
@@ -203,9 +242,8 @@ public class GameScreen implements Screen {
 
         }
 
-        if (event.getEvent().equals(GameEvent.EventType.SOSMade)) {
+        if (event instanceof SOSMadeEvent) {
 
-            assert event instanceof SOSMadeEvent;
             SOSMadeEvent e = (SOSMadeEvent) event;
 
             Vector3 start = tiles.get(e.row1).get(e.col1).worldCenter;
@@ -215,7 +253,23 @@ public class GameScreen implements Screen {
             modelsToRender.add(SOSSlashModel.SOSSlashInstance(start, middle, end, e.color));
 
         }
+
+        if (event instanceof WinnerEvent) {
+
+            WinnerEvent e = (WinnerEvent) event;
+            gameOver = true;
+            endGameMessage = "Winner: " + e.player.toString();
+        }
+
+        if (event instanceof TieEvent) {
+
+            TieEvent e = (TieEvent) event;
+            gameOver = true;
+            endGameMessage = e.message;
+        }
     }
+
+
 
     @Override
     public void pause() {}
