@@ -14,7 +14,7 @@ class SimpleGameLogic extends GameLogic {
     @Override
     public boolean isWinner() {
 
-        return Arrays.stream(scoreArr).sum() > 0;
+        return Arrays.stream(scoreArr).sum() > 0 || capacity == 0;
     }
 
     @Override

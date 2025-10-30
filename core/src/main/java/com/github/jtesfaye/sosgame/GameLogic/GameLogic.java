@@ -3,6 +3,7 @@ package com.github.jtesfaye.sosgame.GameLogic;
 import com.badlogic.gdx.graphics.Color;
 import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
 import com.github.jtesfaye.sosgame.GameEvent.PieceSetEvent;
+import com.github.jtesfaye.sosgame.GameEvent.TieEvent;
 import com.github.jtesfaye.sosgame.GameEvent.WinnerEvent;
 import com.github.jtesfaye.sosgame.util.Pair;
 import lombok.Getter;
@@ -84,16 +85,12 @@ public abstract class GameLogic {
     /**
      * This function determines which player won the game. It is only called if isWinner returns true
      */
-    public Player getWinner() {
+    public int getWinner() {
 
-        int index = IntStream
+        return IntStream
             .range(0, scoreArr.length)
             .reduce((i, j) -> scoreArr[i] > scoreArr[j] ? i : j)
             .orElse(-1);
-
-        System.out.printf("The winnder is %s\n", players[index].toString());
-
-        return players[index];
     }
 
     public void setPiece(int r, int c, Piece piece) {
@@ -102,7 +99,16 @@ public abstract class GameLogic {
             eventQueue.add(new PieceSetEvent(r, c, piece));
 
             if (checkSOS(r,c) && isWinner()) {
-                eventQueue.add(new WinnerEvent(getWinner()));
+                int playerIndex = getWinner();
+
+                if (playerIndex == -1) {
+                    eventQueue.add(new TieEvent());
+                    return;
+                }
+                eventQueue.add(new WinnerEvent(players[playerIndex]));
+                return;
+            } else if (isWinner()) {
+                eventQueue.add(new TieEvent());
                 return;
             }
 
@@ -140,6 +146,7 @@ public abstract class GameLogic {
     }
 
     public Player getCurrentTurn() {
+
         return players[currentTurn];
     }
 
@@ -162,6 +169,7 @@ public abstract class GameLogic {
     }
 
     public String getOpponentName() {
+
         return players[1].toString();
     }
 
