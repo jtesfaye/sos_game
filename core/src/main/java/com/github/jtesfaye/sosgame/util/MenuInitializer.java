@@ -1,8 +1,13 @@
 package com.github.jtesfaye.sosgame.util;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.github.jtesfaye.sosgame.Screens.MainMenuScreen;
 import lombok.Getter;
 
 public class MenuInitializer {
@@ -53,6 +58,21 @@ public class MenuInitializer {
         table.add(startButton).colspan(2).padTop(20);
 
         return stage;
+    }
+
+    public static TextButton getMainMenuButton(Skin skin, Game game, Screen s) {
+
+        TextButton menuButton = new TextButton("Return to main menu", skin);
+
+        menuButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new MainMenuScreen(game));
+                s.dispose();
+            }
+        });
+
+        return menuButton;
     }
 
     private Label initTitle(Skin skin) {

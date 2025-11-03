@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -98,12 +99,12 @@ public class GameInitializer {
 
     public static PerspectiveCamera initCamera(int width, int height) {
 
-        PerspectiveCamera camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        PerspectiveCamera camera = new PerspectiveCamera(67 + (width - 3) * 1.5f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         float centerx = (width * TileModel.getWidth()) / 2f - (TileModel.getWidth() / 2f);
         float centerz = (height * TileModel.getHeight()) / 2f - (TileModel.getWidth() / 2f);
 
-        camera.position.set(centerx ,10f,-centerz);
+        camera.position.set(centerx ,9f + (width - 3),(-centerz - 1) + (width - 3) * 1.5f);
         camera.lookAt(centerx,0,centerz);
         camera.up.set(0,0,1);
         camera.near = .1f;
