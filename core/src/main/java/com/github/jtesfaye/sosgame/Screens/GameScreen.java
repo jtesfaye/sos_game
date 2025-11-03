@@ -1,5 +1,6 @@
 package com.github.jtesfaye.sosgame.Screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -9,15 +10,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.BoardComponents.*;
 import com.github.jtesfaye.sosgame.GameEvent.*;
 import com.github.jtesfaye.sosgame.GameLogic.Piece;
@@ -26,11 +24,14 @@ import com.github.jtesfaye.sosgame.GameIO.GameInput;
 import com.github.jtesfaye.sosgame.GameIO.InputHandler;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.util.GameInitializer;
+import com.github.jtesfaye.sosgame.util.MenuInitializer;
 import com.github.jtesfaye.sosgame.util.Pair;
 
 import java.util.ArrayList;
 
 public class GameScreen implements Screen {
+
+    private final Game game;
 
     private PerspectiveCamera camera;
 
@@ -50,18 +51,21 @@ public class GameScreen implements Screen {
     private final Stage gameOverlay;
     private final Label currentTurnLabel;
     private final Label currentScoreLabel;
+    private TextButton returnButton;
+    private final Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
     private final ArrayList<ModelInstance> modelsToRender;
 
-    public GameScreen(GameInit init) {
+    public GameScreen(GameInit init, Game game) {
+
+        this.game = game;
 
         gameOver = false;
         logic = init.getLogic();
         builder = init.getBuilder();
         sp = new sPieceModel(Color.GREEN);
         op = new oPieceModel(Color.GREEN);
-
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        returnButton = null;
 
         currentScoreLabel = GameInitializer.initScoreTableLabel(logic.getOpponentName(), skin);
         currentTurnLabel = GameInitializer.initPlayerLabel(skin);
@@ -117,6 +121,7 @@ public class GameScreen implements Screen {
         modelBatch.end();
 
         if (gameOver) {
+            Gdx.input.setInputProcessor(gameOverlay);
             renderEndGame(endGameMessage);
         }
 
@@ -133,6 +138,13 @@ public class GameScreen implements Screen {
         camera.update();
         gameOverlay.getViewport().update(width, height, true);
 
+        if (returnButton != null) {
+
+            returnButton.setPosition(
+                Gdx.graphics.getWidth() / 2f - (returnButton.getWidth() / 2f),
+                Gdx.graphics.getHeight() / 2f - 100
+            );
+        }
     }
 
     @Override
@@ -186,16 +198,27 @@ public class GameScreen implements Screen {
 
         BitmapFont font = new BitmapFont();
         font.getData().setScale(2f);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.GOLD);
 
         batch.begin();
         font.draw(batch, winnerMessage,
-            Gdx.graphics.getWidth() / 2f - 100,
+            Gdx.graphics.getWidth() / 2f - (winnerMessage.length() / 2f) * 11f ,
             Gdx.graphics.getHeight() / 2f + 20);
         batch.end();
 
-        gameOverlay.draw();
+        if (returnButton == null) {
 
+            returnButton = MenuInitializer.getMainMenuButton(skin, game, this);
+            returnButton.setColor(Color.CYAN);
+
+
+            gameOverlay.addActor(returnButton);
+        }
+
+        returnButton.setPosition(
+            Gdx.graphics.getWidth() / 2f - (returnButton.getWidth() / 2f),
+            Gdx.graphics.getHeight() / 2f - 100
+        );
     }
 
     private void setCurrentPlayer() {
@@ -268,8 +291,6 @@ public class GameScreen implements Screen {
             endGameMessage = e.message;
         }
     }
-
-
 
     @Override
     public void pause() {}

@@ -9,9 +9,7 @@ public class Tile {
     public Vector3 worldCenter;
 
     public Tile(ModelInstance m, Vector3 v) {
-
         tileInstance = m;
         worldCenter = v;
-
     }
 }

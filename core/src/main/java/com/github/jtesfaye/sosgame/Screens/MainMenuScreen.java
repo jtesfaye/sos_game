@@ -26,21 +26,19 @@ public class MainMenuScreen implements Screen {
         menu.getStartButton().addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+
                 String sizeSelected = menu.getBoardSizeChoice().getSelected();
                 String modeSelected = menu.getModeChoice().getSelected();
                 String opponentSelected = menu.getOpponentChoice().getSelected();
+
                 game.setScreen(new GameScreen(
-                    GameInitializer.initGame(
-                        sizeSelected,
-                        modeSelected,
-                        opponentSelected)
-                    )
-                );
+                        GameInitializer.initGame(sizeSelected, modeSelected, opponentSelected),
+                        game
+                ));
             }
         });
 
         Gdx.input.setInputProcessor(stage);
-
     }
 
     @Override
