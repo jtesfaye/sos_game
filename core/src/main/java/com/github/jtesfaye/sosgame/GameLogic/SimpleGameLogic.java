@@ -12,7 +12,7 @@ class SimpleGameLogic extends GameLogic {
     }
 
     @Override
-    public boolean isWinner() {
+    public boolean isEndGame() {
 
         return Arrays.stream(scoreArr).sum() > 0 || capacity == 0;
     }

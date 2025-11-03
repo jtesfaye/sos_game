@@ -9,7 +9,7 @@ class GeneralGameLogic extends GameLogic{
     }
 
     @Override
-    public boolean isWinner() {
+    public boolean isEndGame() {
 
         return this.capacity == 0;
     }

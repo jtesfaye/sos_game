@@ -36,7 +36,7 @@ public abstract class GameLogic {
     /**
      * This function checks if there is a winner. It does not determine who the winner is.
      */
-    public abstract boolean isWinner();
+    public abstract boolean isEndGame();
 
     protected GameLogic(int r, int c, String opponentType) {
 
@@ -87,6 +87,10 @@ public abstract class GameLogic {
      */
     public int getWinner() {
 
+        if (scoreArr[0] == scoreArr[1]) {
+            return -1;
+        }
+
         return IntStream
             .range(0, scoreArr.length)
             .reduce((i, j) -> scoreArr[i] > scoreArr[j] ? i : j)
@@ -97,20 +101,21 @@ public abstract class GameLogic {
 
         if (appendBoard(r,c,piece)) {
             eventQueue.add(new PieceSetEvent(r, c, piece));
+            checkSOS(r,c);
 
-            if (checkSOS(r,c) && isWinner()) {
+            if (isEndGame()) {
                 int playerIndex = getWinner();
-
+                System.out.println(playerIndex);
                 if (playerIndex == -1) {
+
                     eventQueue.add(new TieEvent());
                     return;
                 }
+
                 eventQueue.add(new WinnerEvent(players[playerIndex]));
                 return;
-            } else if (isWinner()) {
-                eventQueue.add(new TieEvent());
-                return;
             }
+
 
             nextTurn();
         }
