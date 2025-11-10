@@ -1,4 +1,4 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
-public class InputHandler {
+public class InputRouter {
 }

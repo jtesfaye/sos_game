@@ -14,7 +14,7 @@ public class InputHandlerTest {
     @Test
     public void testHandleClick() {
 
-        GameLogic logic = GameLogicFactory.createGameLogic(3,3, "Simple");
+        GameLogic logic = GameLogicFactory.createGameLogic(3,3, "Simple", "Human");
         InputHandler handler = new InputHandler(logic);
 
         handler.handleClick(0,0, false);
@@ -30,7 +30,7 @@ public class InputHandlerTest {
     @Test
     public void testHandleClickOnFullBoardDoesNothing() {
 
-        GameLogic logic = GameLogicFactory.createGameLogic(3, 3, "Simple");
+        GameLogic logic = GameLogicFactory.createGameLogic(3, 3, "Simple", "Human");
         InputHandler handler = new InputHandler(logic);
 
         for (int row = 0; row < 3; row++) {
