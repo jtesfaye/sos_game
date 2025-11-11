@@ -16,8 +16,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
 import com.github.jtesfaye.sosgame.BoardComponents.TileModel;
+import com.github.jtesfaye.sosgame.GameIO.*;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
+import com.github.jtesfaye.sosgame.GameObject.Player;
 
 
 import java.util.ArrayList;
@@ -27,18 +29,56 @@ public class GameInitializer {
     private static int width;
     private static int height;
 
-    public static GameInit initGame(String boardSize, String gameMode, String opponent) {
+    public static ScreenInit initGame(String boardSize, String gameMode, String opponent) {
 
         Pair<Integer, Integer> dimensions = utilFunctions.getBoardDimensions(boardSize);
 
         width = dimensions.first;
         height = dimensions.second;
 
-        GameLogic logic = GameLogicFactory.createGameLogic(width, height, gameMode, opponent);
+        Player[] players = {
+            PlayerFactory.createPlayer("Human", Color.BLUE),
+            PlayerFactory.createPlayer(opponent, Color.RED)
+        };
+
+        GameLogic logic = GameLogicFactory.createGameLogic(width, height, players, gameMode);
+
+        ArrayList<ClickInputHandler> handlers = initializeInput(logic, players);
 
         BoardBuilder builder = new BoardBuilder(width, height);
 
-        return new GameInit(width, height, logic, builder, gameMode, logic.getOpponentName());
+        return new ScreenInit(width, height, builder, gameMode, logic.getOpponentName(), logic, handlers);
+
+    }
+
+    private static ArrayList<ClickInputHandler> initializeInput(GameLogic logic, Player[] players) {
+
+        ClickInputHandler player1ClickHandler = new ClickInputHandler(players[0].getPlayerId());
+        InputHandler opponentInputHandler = null;
+
+        switch (players[1].getPlayerType()) {
+            case Human:
+                opponentInputHandler = new ClickInputHandler(players[1].getPlayerId());
+                break;
+            case Computer:
+                opponentInputHandler = new ComputerInputHandler(players[1].getPlayerId());
+            default:
+                throw new RuntimeException("Unrecognized player type");
+        }
+
+        InputRouter router = new InputRouter(logic);
+
+        router.registerHandler(player1ClickHandler);
+        router.registerHandler(opponentInputHandler);
+
+        ArrayList<ClickInputHandler> handlers = new ArrayList<>();
+        handlers.add(player1ClickHandler);
+
+        if (opponentInputHandler instanceof ClickInputHandler) {
+            handlers.add((ClickInputHandler) opponentInputHandler);
+        }
+
+        return handlers;
 
     }
 
