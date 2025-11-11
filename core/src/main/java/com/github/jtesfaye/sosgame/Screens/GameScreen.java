@@ -20,8 +20,7 @@ import com.github.jtesfaye.sosgame.BoardComponents.*;
 import com.github.jtesfaye.sosgame.GameEvent.*;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Tile;
-import com.github.jtesfaye.sosgame.GameIO.GameInput;
-import com.github.jtesfaye.sosgame.GameIO.ClickInputHandler;
+import com.github.jtesfaye.sosgame.GameIO.GdxInput;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.util.GameInitializer;
 import com.github.jtesfaye.sosgame.util.MenuInitializer;
@@ -92,7 +91,7 @@ public class GameScreen implements Screen {
         tiles = builder.build(Color.WHITE, Color.GRAY);
         ArrayList <ArrayList<ModelInstance>> tileInstances = makeTileInstances();
 
-        GameInput inputProcessor = new GameInput(camera, tileInstances, init.getHandlers(), init.getLogic());
+        GdxInput inputProcessor = new GdxInput(camera, tileInstances, init.getHandlers(), init.getLogic());
         Gdx.input.setInputProcessor(inputProcessor);
 
     }
