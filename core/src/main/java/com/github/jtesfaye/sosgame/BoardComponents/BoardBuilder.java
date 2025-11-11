@@ -3,8 +3,8 @@ package com.github.jtesfaye.sosgame.BoardComponents;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.github.jtesfaye.sosgame.GameObject.Tile;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -71,5 +71,4 @@ public class BoardBuilder {
         }
         return tiles;
     }
-
 }
