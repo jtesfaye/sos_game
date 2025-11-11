@@ -1,5 +1,6 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
+import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 
 import java.util.Optional;
@@ -15,10 +16,10 @@ public class ClickInputHandler extends InputHandler {
     public void handleClick(int row, int col, boolean isLeft) {
 
         Piece piece = isLeft ? Piece.sPiece : Piece.oPiece;
-        consumer.accept(new InputEvent(row, col, piece, Optional.ofNullable(playerId)));
+        consumer.accept(new InputEvent(new Move(row, col, piece), playerId));
 
     }
 
     @Override
-    public void getInput() {}
+    public void getInput(Piece[][] b) {}
 }
