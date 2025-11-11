@@ -18,14 +18,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.github.jtesfaye.sosgame.BoardComponents.*;
 import com.github.jtesfaye.sosgame.GameEvent.*;
-import com.github.jtesfaye.sosgame.GameLogic.Piece;
-import com.github.jtesfaye.sosgame.util.GameInit;
+import com.github.jtesfaye.sosgame.GameObject.Piece;
+import com.github.jtesfaye.sosgame.GameObject.Tile;
 import com.github.jtesfaye.sosgame.GameIO.GameInput;
-import com.github.jtesfaye.sosgame.GameIO.InputHandler;
+import com.github.jtesfaye.sosgame.GameIO.ClickInputHandler;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.util.GameInitializer;
 import com.github.jtesfaye.sosgame.util.MenuInitializer;
 import com.github.jtesfaye.sosgame.util.Pair;
+import com.github.jtesfaye.sosgame.util.ScreenInit;
 
 import java.util.ArrayList;
 
@@ -54,12 +55,13 @@ public class GameScreen implements Screen {
     private TextButton returnButton;
     private final Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
+    private final ScreenInit init;
     private final ArrayList<ModelInstance> modelsToRender;
 
-    public GameScreen(GameInit init, Game game) {
+    public GameScreen(ScreenInit init, Game game) {
 
         this.game = game;
-
+        this.init = init;
         gameOver = false;
         logic = init.getLogic();
         builder = init.getBuilder();
@@ -90,7 +92,7 @@ public class GameScreen implements Screen {
         tiles = builder.build(Color.WHITE, Color.GRAY);
         ArrayList <ArrayList<ModelInstance>> tileInstances = makeTileInstances();
 
-        GameInput inputProcessor = new GameInput(camera, tileInstances, new InputHandler(logic));
+        GameInput inputProcessor = new GameInput(camera, tileInstances, init.getHandlers(), init.getLogic());
         Gdx.input.setInputProcessor(inputProcessor);
 
     }
