@@ -5,19 +5,20 @@ import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
 import com.github.jtesfaye.sosgame.GameEvent.PieceSetEvent;
 import com.github.jtesfaye.sosgame.GameEvent.TieEvent;
 import com.github.jtesfaye.sosgame.GameEvent.WinnerEvent;
+import com.github.jtesfaye.sosgame.GameObject.Piece;
+import com.github.jtesfaye.sosgame.GameObject.Player;
 import com.github.jtesfaye.sosgame.util.Pair;
 import lombok.Getter;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.Queue;
 import java.util.stream.IntStream;
 
 public abstract class GameLogic {
 
     protected int currentTurn;
-    Player[] players;
+    private final Player[] players;
 
     @Getter
     int[] scoreArr; //Keeps track of SOS count for each player
@@ -26,6 +27,7 @@ public abstract class GameLogic {
     public int boardCol;
     protected int capacity;
 
+    @Getter
     protected final Piece[][] board;
     protected final SOSChecker checker;
 
@@ -38,31 +40,13 @@ public abstract class GameLogic {
      */
     public abstract boolean isEndGame();
 
-    protected GameLogic(int r, int c, String opponentType) {
+    protected GameLogic(int r, int c, Player[] players) {
 
         boardRow = r;
         boardCol = c;
         capacity = r * c;
 
-        players = new Player[2];
-
-        players[0] = new Player("Player 1", Color.BLUE);
-
-        Color oppColor = Color.RED;
-        switch (opponentType) {
-
-            case "Human":
-                players[1] = new Player("Player 2", oppColor);
-                break;
-            case "Computer":
-                players[1] = new Player("Computer", oppColor);
-                break;
-            case "LLM":
-                players[1] = new Player("LLM", oppColor);
-                break;
-            default:
-                throw new RuntimeException("Invalid opponent type");
-        }
+        this.players = players;
 
         currentTurn = 0;
 
@@ -97,27 +81,33 @@ public abstract class GameLogic {
             .orElse(-1);
     }
 
-    public void setPiece(int r, int c, Piece piece) {
+    public void applyMove(int r, int c, Piece piece) {
 
         if (appendBoard(r,c,piece)) {
+
             eventQueue.add(new PieceSetEvent(r, c, piece));
-            checkSOS(r,c);
+
+            boolean changeTurn = checkSOS(r,c);
 
             if (isEndGame()) {
+
                 int playerIndex = getWinner();
                 System.out.println(playerIndex);
+
                 if (playerIndex == -1) {
 
                     eventQueue.add(new TieEvent());
                     return;
+
                 }
 
                 eventQueue.add(new WinnerEvent(players[playerIndex]));
                 return;
             }
 
-
-            nextTurn();
+            if (!changeTurn) {
+                nextTurn();
+            }
         }
     }
 

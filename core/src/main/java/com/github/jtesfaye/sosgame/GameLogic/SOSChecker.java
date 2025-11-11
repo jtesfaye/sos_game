@@ -1,7 +1,8 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
-import com.badlogic.gdx.graphics.Color;
 import com.github.jtesfaye.sosgame.GameEvent.SOSMadeEvent;
+import com.github.jtesfaye.sosgame.GameObject.Piece;
+import com.github.jtesfaye.sosgame.GameObject.Player;
 
 public class SOSChecker {
 

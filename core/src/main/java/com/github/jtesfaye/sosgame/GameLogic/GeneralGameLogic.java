@@ -1,11 +1,12 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
 import com.github.jtesfaye.sosgame.GameEvent.SOSMadeEvent;
+import com.github.jtesfaye.sosgame.GameObject.Player;
 
 class GeneralGameLogic extends GameLogic{
 
-    GeneralGameLogic(int r, int h, String opponent) {
-        super(r, h, opponent);
+    GeneralGameLogic(int r, int h, Player[] players) {
+        super(r, h, players);
     }
 
     @Override
@@ -17,6 +18,7 @@ class GeneralGameLogic extends GameLogic{
     @Override
     protected boolean checkSOS(int r, int c) {
 
+        //General game
         SOSMadeEvent event;
         int count = 0;
 
