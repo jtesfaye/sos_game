@@ -22,22 +22,9 @@ public class Player {
     private final Type playerType;
     private final String description;
 
-    public Player(Type type, Color color) {
+    public Player(Type type, Color color, String displayName) {
 
-        switch (type) {
-            case Human:
-                description = "Human";
-                break;
-            case Computer:
-                description = "Computer";
-                break;
-            case LLM:
-                description = "LLM";
-                break;
-            default:
-                description = "";
-        }
-
+        description = displayName;
         playerColor = color;
         playerType = type;
         playerId = UUID.randomUUID();
