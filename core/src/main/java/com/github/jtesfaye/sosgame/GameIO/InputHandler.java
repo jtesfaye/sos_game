@@ -1,5 +1,6 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
+import com.github.jtesfaye.sosgame.GameObject.Piece;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -23,13 +24,11 @@ public abstract class InputHandler {
     }
 
     public InputHandler(UUID playerId, InputType type) {
-
         this.playerId = playerId;
         this.inputType = type;
-
     }
 
-    abstract public void getInput();
+    abstract public void getInput(Piece[][] board);
 
     protected void addConsumer(Consumer<InputEvent> e) {
         this.consumer = e;

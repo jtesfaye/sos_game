@@ -1,6 +1,7 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
+import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Player;
 
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class InputRouter {
             return;
         }
 
-        handler.getInput();
+        handler.getInput(logic.getBoard());
 
     }
 
@@ -43,28 +44,12 @@ public class InputRouter {
 
         Player currentPlayer = logic.getCurrentTurn();
 
-        if (currentPlayer.getPlayerType().equals(Player.Type.Human) && (!e.getPlayerId().isPresent())) {
-            throw new RuntimeException("Current turn is human player, but player id is not present");
-        }
-
-        //This is so click inputs from a human is only processed on their turn.
-        /*
-            If inputEvent is from a human player, and its their turn, apply the move
-            otherwise, if the inputEvent is from a human, but its not their turn, exit
-         */
-        if (currentPlayer.getPlayerType().equals(Player.Type.Human)
-            && currentPlayer.getPlayerId().equals(e.getPlayerId().get())) {
-
-            logic.applyMove(e.getRow(), e.getCol(), e.getPiece());
-
-        } else if (!(currentPlayer.getPlayerType().equals(Player.Type.Human)
-            && currentPlayer.getPlayerId().equals(e.getPlayerId().get()))) {
-
+        //If its not their turn, ignore players input
+        if (!e.getPlayerId().equals(currentPlayer.getPlayerId())) {
             return;
         }
 
-
-        logic.applyMove(e.getRow(), e.getCol(), e.getPiece());
+        logic.applyMove(e.getMove());
 
         onNextTurn();
     }

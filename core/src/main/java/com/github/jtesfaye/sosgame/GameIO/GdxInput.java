@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class GameInput extends InputAdapter {
+public class GdxInput extends InputAdapter {
 
     private final PerspectiveCamera camera;
     private final ArrayList<ArrayList<ModelInstance>> tiles;
@@ -26,7 +26,7 @@ public class GameInput extends InputAdapter {
     private Player currentPlayer;
     private final GameLogic logic;
 
-    public GameInput(
+    public GdxInput(
         PerspectiveCamera c,
         ArrayList<ArrayList<ModelInstance>> t,
         ArrayList<ClickInputHandler> handlers,
@@ -61,7 +61,9 @@ public class GameInput extends InputAdapter {
                 tile.calculateBoundingBox(bounds);
                 bounds.mul(tile.transform);
 
-                if (Intersector.intersectRayBoundsFast(ray, bounds)) {
+                if (Intersector.intersectRayBoundsFast(ray, bounds)
+                    && currentPlayer.getPlayerType().equals(Player.Type.Human)) {
+
                     handlers.get(currentPlayer.getPlayerId()).handleClick(r, c, button == Input.Buttons.LEFT);
                     currentPlayer = logic.getCurrentTurn();
                     return true;
