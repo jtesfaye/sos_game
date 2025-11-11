@@ -1,4 +1,4 @@
-package com.github.jtesfaye.sosgame.GameLogic;
+package com.github.jtesfaye.sosgame.GameObject;
 
 import com.badlogic.gdx.graphics.Color;
 import lombok.Getter;
@@ -12,6 +12,7 @@ public class Player {
       Human, Computer, LLM
     };
 
+    @Getter
     private final UUID playerId;
 
     @Getter
@@ -48,7 +49,4 @@ public class Player {
         return description;
     }
 
-    public String getPlayerId() {
-        return playerId.toString();
-    }
 }

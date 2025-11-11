@@ -1,4 +1,4 @@
-package com.github.jtesfaye.sosgame.GameLogic;
+package com.github.jtesfaye.sosgame.GameObject;
 
 public enum Piece {
 
