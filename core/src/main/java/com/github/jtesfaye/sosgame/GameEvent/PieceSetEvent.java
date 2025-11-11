@@ -1,6 +1,6 @@
 package com.github.jtesfaye.sosgame.GameEvent;
 
-import com.github.jtesfaye.sosgame.GameLogic.Piece;
+import com.github.jtesfaye.sosgame.GameObject.Piece;
 
 public class PieceSetEvent extends GameEvent {
 

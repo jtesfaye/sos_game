@@ -1,6 +1,6 @@
 package com.github.jtesfaye.sosgame.GameEvent;
 
-import com.github.jtesfaye.sosgame.GameLogic.Player;
+import com.github.jtesfaye.sosgame.GameObject.Player;
 
 public class WinnerEvent extends GameEvent {
 
