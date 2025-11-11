@@ -5,6 +5,7 @@ import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
 import com.github.jtesfaye.sosgame.GameEvent.PieceSetEvent;
 import com.github.jtesfaye.sosgame.GameEvent.TieEvent;
 import com.github.jtesfaye.sosgame.GameEvent.WinnerEvent;
+import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Player;
 import com.github.jtesfaye.sosgame.util.Pair;
@@ -81,7 +82,11 @@ public abstract class GameLogic {
             .orElse(-1);
     }
 
-    public void applyMove(int r, int c, Piece piece) {
+    public void applyMove(Move move) {
+
+        int r = move.getRow();
+        int c = move.getCol();
+        Piece piece = move.getPiece();
 
         if (appendBoard(r,c,piece)) {
 
