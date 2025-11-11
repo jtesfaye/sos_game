@@ -20,6 +20,7 @@ import com.github.jtesfaye.sosgame.GameIO.*;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.gameStrategy.EasyGameStrategy;
 
 
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ public class GameInitializer {
         height = dimensions.second;
 
         Player[] players = {
-            PlayerFactory.createPlayer("Human", Color.BLUE),
-            PlayerFactory.createPlayer(opponent, Color.RED)
+            PlayerFactory.createPlayer("Human", Color.BLUE, "Player 1"),
+            PlayerFactory.createPlayer(opponent, Color.RED, "Player 2")
         };
 
         GameLogic logic = GameLogicFactory.createGameLogic(width, height, players, gameMode);
@@ -61,7 +62,8 @@ public class GameInitializer {
                 opponentInputHandler = new ClickInputHandler(players[1].getPlayerId());
                 break;
             case Computer:
-                opponentInputHandler = new ComputerInputHandler(players[1].getPlayerId());
+                opponentInputHandler = new ComputerInputHandler(players[1].getPlayerId(), new EasyGameStrategy());
+                break;
             default:
                 throw new RuntimeException("Unrecognized player type");
         }
