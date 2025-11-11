@@ -1,22 +1,24 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
-import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
-import com.github.jtesfaye.sosgame.GameLogic.Piece;
+import com.github.jtesfaye.sosgame.GameObject.Piece;
 
-public class InputHandler {
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 
-    private final GameLogic logic;
+public class ClickInputHandler extends InputHandler {
 
-    public InputHandler(GameLogic logic) {
-
-        this.logic = logic;
-
+    public ClickInputHandler(UUID playerId) {
+        super(playerId, InputType.PassiveIO);
     }
 
-    public boolean handleClick(int row, int col, boolean isLeft) {
+    public void handleClick(int row, int col, boolean isLeft) {
+
         Piece piece = isLeft ? Piece.sPiece : Piece.oPiece;
-        logic.setPiece(row, col, piece);
-        return true;
+        consumer.accept(new InputEvent(row, col, piece, Optional.ofNullable(playerId)));
 
     }
+
+    @Override
+    public void getInput() {}
 }
