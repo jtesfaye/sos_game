@@ -30,7 +30,7 @@ public class GameInitializer {
     private static int width;
     private static int height;
 
-    public static ScreenInit initGame(String boardSize, String gameMode, String opponent) {
+    public static ScreenInit initGame(String boardSize, String gameMode, String opponent, String p1Color, String p2Color) {
 
         Pair<Integer, Integer> dimensions = utilFunctions.getBoardDimensions(boardSize);
 
@@ -38,8 +38,8 @@ public class GameInitializer {
         height = dimensions.second;
 
         Player[] players = {
-            PlayerFactory.createPlayer("Human", Color.BLUE, "Player 1"),
-            PlayerFactory.createPlayer(opponent, Color.RED, "Player 2")
+            PlayerFactory.createPlayer("Human", getColor(p1Color), "Player 1"),
+            PlayerFactory.createPlayer(opponent, getColor(p2Color) , "Player 2")
         };
 
         GameLogic logic = GameLogicFactory.createGameLogic(width, height, players, gameMode);
@@ -155,5 +155,29 @@ public class GameInitializer {
 
         return camera;
 
+    }
+
+    static private Color getColor(String color) {
+
+        switch (color) {
+
+            case "BLUE":
+                return Color.BLUE;
+
+            case "RED":
+                return Color.RED;
+
+            case "GOLD":
+                return Color.GOLD;
+
+            case "PURPLE":
+                return Color.PURPLE;
+
+            case "GREEN":
+                return Color.GREEN;
+
+            default:
+                return Color.SKY;
+        }
     }
 }

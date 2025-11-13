@@ -10,7 +10,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.Screens.MainMenuScreen;
 import lombok.Getter;
 
+import java.util.ArrayList;
+
 public class MenuInitializer {
+
+    private final String[] colors = {"RED", "BLUE", "PURPLE", "GREEN", "GOLD"};
 
     @Getter
     private TextButton startButton;
@@ -23,6 +27,14 @@ public class MenuInitializer {
 
     @Getter
     private SelectBox<String> opponentChoice;
+
+    @Getter
+    private SelectBox<String> player1ColorChoice;
+
+    @Getter
+    private SelectBox<String> player2ColorChoice;
+
+    private Label p2ColorLabel;
 
     public Stage createStage(Skin skin) {
 
@@ -49,9 +61,63 @@ public class MenuInitializer {
 
         table.add(initOpponentTypeLabel(skin)).padRight(10);
         opponentChoice = new SelectBox<>(skin);
-        opponentChoice.setItems("Human", "Computer", "LLM");
+        opponentChoice.setItems("Computer", "Human", "LLM");
         table.add(opponentChoice).padBottom(15);
         table.row();
+
+        table.add(initColorSelectLabel(skin, 1)).padRight(10);
+        player1ColorChoice = new SelectBox<>(skin);
+        player1ColorChoice.setItems(colors);
+        table.add(player1ColorChoice).padBottom(15);
+        table.row();
+
+
+        opponentChoice.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                if ("Human".equals(opponentChoice.getSelected())) {
+
+                    if (player2ColorChoice != null) {
+                        return;
+                    }
+
+                    if (startButton.hasParent()) startButton.remove();
+
+                    table.row();
+
+                    p2ColorLabel = initColorSelectLabel(skin, 2);
+                    table.add(p2ColorLabel).padRight(10);
+                    player2ColorChoice = new SelectBox<>(skin);
+                    setPlayer2ColorChoice();
+                    table.add(player2ColorChoice).padBottom(15);
+                    table.row();
+
+                    table.add(startButton).colspan(2).padTop(20);
+
+                } else {
+
+                    if (player2ColorChoice == null) return;
+                    if (player2ColorChoice.hasParent()) {
+                        player2ColorChoice.remove();
+                        p2ColorLabel.remove();
+                        player2ColorChoice = null;
+                        p2ColorLabel = null;
+                    }
+                }
+            }
+        });
+
+        player1ColorChoice.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                if (player2ColorChoice == null) {
+                    return;
+                }
+                setPlayer2ColorChoice();
+            }
+        });
 
         startButton = new TextButton("Start game", skin);
 
@@ -91,4 +157,24 @@ public class MenuInitializer {
         return new Label("Select opponent: ", skin);
     }
 
+    private Label initColorSelectLabel(Skin skin, int playerNum) {
+        return new Label("Player " + playerNum + " select a color:", skin);
+    }
+
+    private void setPlayer2ColorChoice() {
+
+        ArrayList<String> p2Colors = new ArrayList<>();
+
+        for (int i = 0; i < colors.length; i++) {
+
+            if (player1ColorChoice.getSelected().equals(colors[i])) {
+                continue;
+            }
+
+            p2Colors.add(colors[i]);
+
+        }
+
+        player2ColorChoice.setItems(p2Colors.toArray(new String[0]));
+    }
 }
