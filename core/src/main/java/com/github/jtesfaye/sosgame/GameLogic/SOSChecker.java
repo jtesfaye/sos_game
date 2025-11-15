@@ -3,6 +3,10 @@ package com.github.jtesfaye.sosgame.GameLogic;
 import com.github.jtesfaye.sosgame.GameEvent.SOSMadeEvent;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.util.Pair;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SOSChecker {
 
@@ -18,7 +22,7 @@ public class SOSChecker {
 
     }
 
-    public SOSMadeEvent checkDiagonal(int row, int col, Player player) {
+    public ArrayList<Pair<Integer, Integer>> checkDiagonal(int row, int col) {
 
         if (board[row][col].equals(Piece.oPiece)) {
 
@@ -36,7 +40,11 @@ public class SOSChecker {
                     if(board[row1][col1].equals(Piece.sPiece)
                         && board[row3][col3].equals(Piece.sPiece)) {
 
-                        return new SOSMadeEvent(row1, col1, row, col, row3, col3, player.getPlayerColor());
+                        return new ArrayList<>(Arrays.asList(
+                            new Pair<>(row1, col1),
+                            new Pair<>(row, col),
+                            new Pair<>(row3, col3)
+                            ));
                     }
                 }
             }
@@ -57,7 +65,12 @@ public class SOSChecker {
 
                     if (board[row2][col2].equals(Piece.oPiece)
                         && board[row3][col3].equals(Piece.sPiece)) {
-                        return new SOSMadeEvent(row, col, row2, col2, row3, col3, player.getPlayerColor());
+
+                        return new ArrayList<>(Arrays.asList(
+                            new Pair<>(row, col),
+                            new Pair<>(row2, col2),
+                            new Pair<>(row3, col3)
+                        ));
                     }
                 }
             }
@@ -66,14 +79,19 @@ public class SOSChecker {
         return null;
     }
 
-    public SOSMadeEvent checkVertical(int row, int col, Player player) {
+    public ArrayList<Pair<Integer, Integer>> checkVertical(int row, int col) {
 
         if (board[row][col].equals(Piece.oPiece)) {
 
             if (checkBounds(row, col + 1) && checkBounds(row, col - 1)) {
                 if (board[row][col + 1].equals(Piece.sPiece)
                     && board[row][col - 1].equals(Piece.sPiece)) {
-                    return new SOSMadeEvent(row, col - 1, row, col, row, col + 1, player.getPlayerColor());
+
+                    return new ArrayList<>(Arrays.asList(
+                        new Pair<>(row, col - 1),
+                        new Pair<>(row, col),
+                        new Pair<>(row, col + 1)
+                    ));
                 }
             }
         }
@@ -88,7 +106,13 @@ public class SOSChecker {
 
                     if (board[row][col + d[1]].equals(Piece.oPiece)
                         && board[row][col + 2 * d[1]].equals(Piece.sPiece)) {
-                        return new SOSMadeEvent(row, col, row, col + d[1], row, col + 2*d[1], player.getPlayerColor());
+
+                        return new ArrayList<>(Arrays.asList(
+                            new Pair<>(row, col),
+                            new Pair<>(row, col + d[1]),
+                            new Pair<>(row, col + 2*d[1])
+                        ));
+
                     }
                 }
             }
@@ -97,14 +121,19 @@ public class SOSChecker {
         return null;
     }
 
-    public SOSMadeEvent checkHorizontal(int row, int col, Player player) {
+    public ArrayList<Pair<Integer, Integer>> checkHorizontal(int row, int col) {
 
         if (board[row][col].equals(Piece.oPiece)) {
 
             if (checkBounds(row  + 1, col) && checkBounds(row - 1, col)) {
                 if (board[row + 1][col].equals(Piece.sPiece)
                     && board[row - 1][col].equals(Piece.sPiece)) {
-                    return new SOSMadeEvent(row + 1, col, row, col, row - 1, col, player.getPlayerColor());
+
+                    return new ArrayList<>(Arrays.asList(
+                        new Pair<>(row + 1, col),
+                        new Pair<>(row, col),
+                        new Pair<>(row - 1, col)
+                    ));
                 }
             }
         }
@@ -119,7 +148,13 @@ public class SOSChecker {
 
                     if (board[row + d[0]][col].equals(Piece.oPiece)
                         && board[row + 2 * d[0]][col].equals(Piece.sPiece)) {
-                        return new SOSMadeEvent(row, col, row + d[0], col, row + 2 * d[0], col, player.getPlayerColor());
+
+                        return new ArrayList<>(Arrays.asList(
+                            new Pair<>(row, col),
+                            new Pair<>(row + d[0], col),
+                            new Pair<>(row + 2 * d[0], col)
+                        ));
+
                     }
                 }
             }

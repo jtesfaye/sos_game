@@ -3,20 +3,22 @@ package com.github.jtesfaye.sosgame.GameEvent;
 import com.badlogic.gdx.graphics.Color;
 import com.github.jtesfaye.sosgame.util.Pair;
 
+import java.util.ArrayList;
+
 public class SOSMadeEvent extends GameEvent {
 
-    public final int row1, row2 ,row3;
-    public final int col1, col2, col3;
     public final Color color;
 
-    public SOSMadeEvent(int r1, int c1, int r2, int c2, int r3, int c3, Color color) {
+    public final Pair<Integer, Integer> tile1;
+    public final Pair<Integer, Integer> tile2;
+    public final Pair<Integer,Integer> tile3;
+
+    public SOSMadeEvent(ArrayList<Pair<Integer, Integer>> tiles, Color color) {
         super(EventType.SOSMade);
-        this.row1 = r1;
-        this.row2 = r2;
-        this.row3 = r3;
-        this.col1 = c1;
-        this.col2 = c2;
-        this.col3 = c3;
+
+        tile1 = tiles.get(0);
+        tile2 = tiles.get(1);
+        tile3 = tiles.get(2);
         this.color = color;
     }
 }
