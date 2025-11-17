@@ -4,11 +4,12 @@ import com.github.jtesfaye.sosgame.GameObject.Player;
 
 public class WinnerEvent extends GameEvent {
 
-    public final Player player;
+
+    public String message = "Winner: ";
 
     public WinnerEvent(Player player) {
         super(EventType.DeclareWinner);
-
-        this.player = player;
+        
+        message += player.toString();
     }
 }

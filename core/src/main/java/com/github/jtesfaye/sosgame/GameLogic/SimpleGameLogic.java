@@ -1,8 +1,11 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
 import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
+
 import com.github.jtesfaye.sosgame.GameEvent.SOSMadeEvent;
+import com.github.jtesfaye.sosgame.GameEvent.scoreChangeEvent;
 import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.util.GameEventProcessor;
 import com.github.jtesfaye.sosgame.util.Pair;
 
 import java.util.ArrayList;
@@ -12,8 +15,8 @@ import java.util.stream.IntStream;
 
 class SimpleGameLogic extends GameLogic {
 
-    SimpleGameLogic(int r, int h, Player[] players, Queue<GameEvent> q) {
-        super(r, h, players, q);
+    SimpleGameLogic(int r, int h, Player[] players, GameEventProcessor p) {
+        super(r, h, players, p);
     }
 
     @Override
@@ -29,26 +32,17 @@ class SimpleGameLogic extends GameLogic {
         ArrayList<Pair<Integer, Integer>> tiles;
 
         if ((tiles = checker.checkDiagonal(r, c)) != null) {
-
-            scoreArr[currentTurn] += 1;
-            SOSMadeEvent event = new SOSMadeEvent(tiles, getCurrentTurn().getPlayerColor());
-            this.eventQueue.add(event);
+            onSOSMade(tiles);
             return false;
         }
 
         if ((tiles = checker.checkHorizontal(r, c)) != null) {
-
-            scoreArr[currentTurn] += 1;
-            SOSMadeEvent event = new SOSMadeEvent(tiles, getCurrentTurn().getPlayerColor());
-            this.eventQueue.add(event);
+            onSOSMade(tiles);
             return false;
         }
 
         if ((tiles = checker.checkVertical(r, c)) != null) {
-
-            scoreArr[currentTurn] += 1;
-            SOSMadeEvent event = new SOSMadeEvent(tiles, getCurrentTurn().getPlayerColor());
-            this.eventQueue.add(event);
+            onSOSMade(tiles);
             return false;
         }
 

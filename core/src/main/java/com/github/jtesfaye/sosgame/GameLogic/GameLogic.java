@@ -1,13 +1,11 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
 import com.badlogic.gdx.graphics.Color;
-import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
-import com.github.jtesfaye.sosgame.GameEvent.PieceSetEvent;
-import com.github.jtesfaye.sosgame.GameEvent.TieEvent;
-import com.github.jtesfaye.sosgame.GameEvent.WinnerEvent;
+import com.github.jtesfaye.sosgame.GameEvent.*;
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.util.GameEventProcessor;
 import com.github.jtesfaye.sosgame.util.Pair;
 import lombok.Getter;
 
@@ -18,7 +16,7 @@ import java.util.stream.IntStream;
 
 public abstract class GameLogic {
 
-    protected int currentTurn;
+    protected int currentPlayerIndex;
     private final Player[] players;
 
     @Getter
@@ -32,7 +30,7 @@ public abstract class GameLogic {
     protected final Piece[][] board;
     protected final SOSChecker checker;
 
-    protected final Queue<GameEvent> eventQueue;
+    protected final GameEventProcessor p;
 
     protected abstract boolean checkSOS(int r, int c);
 
@@ -41,7 +39,7 @@ public abstract class GameLogic {
      */
     public abstract boolean isEndGame();
 
-    protected GameLogic(int r, int c, Player[] players) {
+    protected GameLogic(int r, int c, Player[] players, GameEventProcessor p) {
 
         boardRow = r;
         boardCol = c;
@@ -49,7 +47,7 @@ public abstract class GameLogic {
 
         this.players = players;
 
-        currentTurn = 0;
+        currentPlayerIndex = 0;
 
         board = new Piece[r][c];
 
@@ -60,7 +58,7 @@ public abstract class GameLogic {
             }
         }
 
-        eventQueue = new ArrayDeque<>();
+        this.p = p;
 
         scoreArr = new int[players.length];
 
@@ -84,13 +82,17 @@ public abstract class GameLogic {
 
     public void applyMove(Move move) {
 
+        if (move == null) {
+            return;
+        }
+
         int r = move.getRow();
         int c = move.getCol();
         Piece piece = move.getPiece();
 
         if (appendBoard(r,c,piece)) {
 
-            eventQueue.add(new PieceSetEvent(r, c, piece));
+            p.addEvent(new PieceSetEvent(r, c, piece));
 
             boolean changeTurn = checkSOS(r,c);
 
@@ -101,12 +103,12 @@ public abstract class GameLogic {
 
                 if (playerIndex == -1) {
 
-                    eventQueue.add(new TieEvent());
+                    p.addEvent(new EndGameEvent(null));
                     return;
 
                 }
 
-                eventQueue.add(new WinnerEvent(players[playerIndex]));
+                p.addEvent(new EndGameEvent(players[playerIndex]));
                 return;
             }
 
@@ -119,12 +121,14 @@ public abstract class GameLogic {
     protected void nextTurn() {
 
         int numPlayers = players.length;
-        int val = currentTurn;
+        int val = currentPlayerIndex;
 
         val += 1;
         val = val % numPlayers;
 
-        currentTurn = val;
+        currentPlayerIndex = val;
+
+        p.addEvent(new turnChangeEvent(players[currentPlayerIndex]));
     }
 
     public boolean isOpen(int r, int c) {
@@ -147,12 +151,7 @@ public abstract class GameLogic {
 
     public Player getCurrentTurn() {
 
-        return players[currentTurn];
-    }
-
-    public GameEvent getChanges() {
-
-        return eventQueue.poll();
+        return players[currentPlayerIndex];
     }
 
     public ArrayList<Pair<String, String>> getScores() {
@@ -182,5 +181,16 @@ public abstract class GameLogic {
 
         capacity -= 1;
         return true;
+    }
+
+    protected void onSOSMade(ArrayList<Pair<Integer, Integer>> tiles) {
+
+        scoreArr[currentPlayerIndex] += 1;
+
+        SOSMadeEvent event = new SOSMadeEvent(tiles, getCurrentTurn().getPlayerColor());
+        scoreChangeEvent newScore = new scoreChangeEvent(getScores());
+
+        p.addEvent(event);
+        p.addEvent(newScore);
     }
 }
