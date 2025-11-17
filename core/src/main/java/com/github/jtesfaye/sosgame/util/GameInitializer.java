@@ -16,21 +16,32 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
 import com.github.jtesfaye.sosgame.BoardComponents.TileModel;
+import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
 import com.github.jtesfaye.sosgame.GameIO.*;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.Main;
+import com.github.jtesfaye.sosgame.Screens.GameScreen;
 import com.github.jtesfaye.sosgame.gameStrategy.EasyGameStrategy;
 
 
 import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GameInitializer {
 
     private static int width;
     private static int height;
 
-    public static ScreenInit initGame(String boardSize, String gameMode, String opponent, String p1Color, String p2Color) {
+    public static NewGameInit initGame(
+        String boardSize,
+        String gameMode,
+        String opponent,
+        String p1Color,
+        String p2Color,
+        Main mGame) {
 
         Pair<Integer, Integer> dimensions = utilFunctions.getBoardDimensions(boardSize);
 
@@ -39,20 +50,22 @@ public class GameInitializer {
 
         Player[] players = {
             PlayerFactory.createPlayer("Human", getColor(p1Color), "Player 1"),
-            PlayerFactory.createPlayer(opponent, getColor(p2Color) , "Player 2")
+            PlayerFactory.createPlayer(opponent, getColor(p2Color), "Player 2")
         };
 
-        GameLogic logic = GameLogicFactory.createGameLogic(width, height, players, gameMode);
+        GameLogic logic = GameLogicFactory.createGameLogic(width, height, players, gameMode, mGame.getProcessor());
 
-        ArrayList<ClickInputHandler> handlers = initializeInput(logic, players);
+        InputRouter router = initializeInputRouter(logic, players, mGame.getProcessor());
 
         BoardBuilder builder = new BoardBuilder(width, height);
 
-        return new ScreenInit(width, height, builder, gameMode, logic.getOpponentName(), logic, handlers);
+        ScreenInit s =  new ScreenInit(width, height, builder, gameMode, logic.getOpponentName());
+        GameScreen screen = new GameScreen(s, mGame);
 
+        return new NewGameInit(logic, router, screen);
     }
 
-    private static ArrayList<ClickInputHandler> initializeInput(GameLogic logic, Player[] players) {
+    private static InputRouter initializeInputRouter(GameLogic logic, Player[] players, GameEventProcessor p) {
 
         ClickInputHandler player1ClickHandler = new ClickInputHandler(players[0].getPlayerId());
         InputHandler opponentInputHandler = null;
@@ -68,20 +81,12 @@ public class GameInitializer {
                 throw new RuntimeException("Unrecognized player type");
         }
 
-        InputRouter router = new InputRouter(logic);
+        InputRouter router = new InputRouter(logic, p);
 
         router.registerHandler(player1ClickHandler);
         router.registerHandler(opponentInputHandler);
 
-        ArrayList<ClickInputHandler> handlers = new ArrayList<>();
-        handlers.add(player1ClickHandler);
-
-        if (opponentInputHandler instanceof ClickInputHandler) {
-            handlers.add((ClickInputHandler) opponentInputHandler);
-        }
-
-        return handlers;
-
+        return router;
     }
 
     public static Stage initTurnUi(Label turn, Label gameMode, Label currentScore) {

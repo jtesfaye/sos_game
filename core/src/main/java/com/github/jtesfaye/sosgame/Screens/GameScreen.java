@@ -1,6 +1,5 @@
 package com.github.jtesfaye.sosgame.Screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -21,17 +20,15 @@ import com.github.jtesfaye.sosgame.GameEvent.*;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Tile;
 import com.github.jtesfaye.sosgame.GameIO.GdxInput;
-import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
-import com.github.jtesfaye.sosgame.util.GameInitializer;
-import com.github.jtesfaye.sosgame.util.MenuInitializer;
-import com.github.jtesfaye.sosgame.util.Pair;
-import com.github.jtesfaye.sosgame.util.ScreenInit;
+import com.github.jtesfaye.sosgame.Main;
+import com.github.jtesfaye.sosgame.util.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class GameScreen implements Screen {
 
-    private final Game game;
+    private final Main game;
 
     private PerspectiveCamera camera;
 
@@ -40,8 +37,6 @@ public class GameScreen implements Screen {
     private Environment env;
     private sPieceModel sp;
     private oPieceModel op;
-
-    private final GameLogic logic;
 
     private boolean gameOver;
     private String endGameMessage;
@@ -57,18 +52,18 @@ public class GameScreen implements Screen {
     private final ScreenInit init;
     private final ArrayList<ModelInstance> modelsToRender;
 
-    public GameScreen(ScreenInit init, Game game) {
+    public GameScreen(ScreenInit init, Main game) {
 
         this.game = game;
         this.init = init;
+
         gameOver = false;
-        logic = init.getLogic();
         builder = init.getBuilder();
-        sp = new sPieceModel(Color.GREEN);
-        op = new oPieceModel(Color.GREEN);
+        sp = new sPieceModel(Color.BLACK);
+        op = new oPieceModel(Color.BLACK);
         returnButton = null;
 
-        currentScoreLabel = GameInitializer.initScoreTableLabel(logic.getOpponentName(), skin);
+        currentScoreLabel = GameInitializer.initScoreTableLabel(init.getOpponentName(), skin);
         currentTurnLabel = GameInitializer.initPlayerLabel(skin);
 
         gameOverlay = GameInitializer.initTurnUi(
@@ -79,6 +74,8 @@ public class GameScreen implements Screen {
 
         modelsToRender = new ArrayList<>();
 
+        registerGameScreen(game.getProcessor());
+
     }
 
     @Override
@@ -86,12 +83,13 @@ public class GameScreen implements Screen {
 
         modelBatch = new ModelBatch();
         env = GameInitializer.initEnvironment();
-        camera = GameInitializer.initCamera(logic.boardRow, logic.boardCol);
+        camera = GameInitializer.initCamera(init.getBoardWidth(), init.getBoardHeight());
 
         tiles = builder.build(Color.WHITE, Color.GRAY);
         ArrayList <ArrayList<ModelInstance>> tileInstances = makeTileInstances();
 
-        GdxInput inputProcessor = new GdxInput(camera, tileInstances, init.getHandlers(), init.getLogic());
+        GdxInput inputProcessor = new GdxInput(camera, tileInstances, game.getProcessor());
+
         Gdx.input.setInputProcessor(inputProcessor);
 
     }
@@ -112,8 +110,6 @@ public class GameScreen implements Screen {
                 modelBatch.render(inst, env);
             }
         }
-
-        updateState();
 
         for (ModelInstance model : modelsToRender) {
             modelBatch.render(model, env);
@@ -156,6 +152,84 @@ public class GameScreen implements Screen {
 
     }
 
+    public void addPieceToRender(PieceSetEvent e) {
+
+        Runnable r = () -> {
+
+            int row = e.row;
+            int col = e.col;
+            Piece p = e.piece;
+
+            Vector3 vec = tiles.get(row).get(col).worldCenter;
+            modelsToRender.add(createPieceInstance(p, vec));
+
+        };
+
+        Gdx.app.postRunnable(r);
+    }
+
+    public void addSOSSlashToRender(SOSMadeEvent e) {
+
+        Runnable r = () -> {
+
+            Pair<Integer, Integer> tile1 = e.tile1;
+            Pair<Integer, Integer> tile2 = e.tile2;
+            Pair<Integer, Integer> tile3 = e.tile3;
+
+            Vector3 start = tiles.get(tile1.first).get(tile1.second).worldCenter;
+            Vector3 middle = tiles.get(tile2.first).get(tile2.second).worldCenter;
+            Vector3 end = tiles.get(tile3.first).get(tile3.second).worldCenter;
+
+            modelsToRender.add(SOSSlashModel.SOSSlashInstance(start, middle, end, e.color));
+
+        };
+
+        Gdx.app.postRunnable(r);
+
+    }
+
+    public void setEndGame(EndGameEvent e) {
+
+        Runnable r = () -> {
+
+            endGameMessage = e.message;
+            gameOver = true;
+
+        };
+
+        Gdx.app.postRunnable(r);
+    }
+
+
+    public void setCurrentPlayer(turnChangeEvent event) {
+
+        Runnable r = () -> {
+
+            currentTurnLabel.setText("Current turn: " + event.upcomingPlayer.toString());
+        };
+
+        Gdx.app.postRunnable(r);
+    }
+
+    public void updateScore(scoreChangeEvent event) {
+
+        Runnable r = () -> {
+
+            ArrayList<Pair<String, String>> scores = event.scores;
+
+            StringBuilder score = new StringBuilder("Current Score:\n");
+            for (Pair<String, String> item : scores) {
+
+                score.append(item.first).append(": ").append(item.second).append("  ");
+
+            }
+
+            currentScoreLabel.setText(score);
+        };
+
+        Gdx.app.postRunnable(r);
+    }
+
     private ArrayList<ArrayList<ModelInstance>> makeTileInstances() {
 
         ArrayList <ArrayList<ModelInstance>> inst = new ArrayList<>();
@@ -174,7 +248,7 @@ public class GameScreen implements Screen {
         return inst;
     }
 
-    private ModelInstance renderPiece(Piece piece, Vector3 center) {
+    private ModelInstance createPieceInstance(Piece piece, Vector3 center) {
 
         Model m = piece.equals(Piece.sPiece) ? sp.getPieceModel() : op.getPieceModel();
         ModelInstance inst = new ModelInstance(m);
@@ -222,75 +296,14 @@ public class GameScreen implements Screen {
         );
     }
 
-    private void setCurrentPlayer() {
+    private void registerGameScreen(GameEventProcessor processor) {
 
-        currentTurnLabel.setText("Current turn: " + logic.getCurrentTurn().toString());
-    }
+        processor.addSubscriber(PieceSetEvent.class, this::addPieceToRender);
+        processor.addSubscriber(scoreChangeEvent.class, this::updateScore);
+        processor.addSubscriber(turnChangeEvent.class, this::setCurrentPlayer);
+        processor.addSubscriber(SOSMadeEvent.class, this::addSOSSlashToRender);
+        processor.addSubscriber(EndGameEvent.class, this::setEndGame);
 
-    private void updateScore() {
-
-        StringBuilder score = new StringBuilder("Current Score:\n");
-        ArrayList<Pair<String, String>> scores = logic.getScores();
-        for (Pair<String, String> item : scores) {
-
-            score.append(item.first).append(": ").append(item.second).append("  ");
-
-        }
-
-        currentScoreLabel.setText(score);
-
-    }
-
-    private void updateState() {
-
-        GameEvent event = logic.getChanges();
-
-        if (event == null) {
-            return;
-        }
-
-        if (event instanceof PieceSetEvent) {
-
-            PieceSetEvent e = (PieceSetEvent) event;
-
-            int row = e.row;
-            int col = e.col;
-            Piece p = e.piece;
-
-            Vector3 center = tiles.get(row).get(col).worldCenter;
-
-            modelsToRender.add(renderPiece(p, center));
-            updateScore();
-
-            setCurrentPlayer();
-
-        }
-
-        if (event instanceof SOSMadeEvent) {
-
-            SOSMadeEvent e = (SOSMadeEvent) event;
-
-            Vector3 start = tiles.get(e.row1).get(e.col1).worldCenter;
-            Vector3 middle = tiles.get(e.row2).get(e.col2).worldCenter;
-            Vector3 end = tiles.get(e.row3).get(e.col3).worldCenter;
-
-            modelsToRender.add(SOSSlashModel.SOSSlashInstance(start, middle, end, e.color));
-
-        }
-
-        if (event instanceof WinnerEvent) {
-
-            WinnerEvent e = (WinnerEvent) event;
-            gameOver = true;
-            endGameMessage = "Winner: " + e.player.toString();
-        }
-
-        if (event instanceof TieEvent) {
-
-            TieEvent e = (TieEvent) event;
-            gameOver = true;
-            endGameMessage = e.message;
-        }
     }
 
     @Override
@@ -300,5 +313,9 @@ public class GameScreen implements Screen {
     public void resume() {}
 
     @Override
-    public void hide() {}
+    public void hide() {
+
+        
+
+    }
 }

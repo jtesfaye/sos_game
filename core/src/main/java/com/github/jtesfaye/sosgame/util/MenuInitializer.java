@@ -1,5 +1,6 @@
 package com.github.jtesfaye.sosgame.util;
 
+import com.github.jtesfaye.sosgame.Main;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.github.jtesfaye.sosgame.Main;
 import com.github.jtesfaye.sosgame.Screens.MainMenuScreen;
 import lombok.Getter;
 
@@ -126,7 +128,7 @@ public class MenuInitializer {
         return stage;
     }
 
-    public static TextButton getMainMenuButton(Skin skin, Game game, Screen s) {
+    public static TextButton getMainMenuButton(Skin skin, Main game, Screen s) {
 
         TextButton menuButton = new TextButton("Return to main menu", skin);
 
