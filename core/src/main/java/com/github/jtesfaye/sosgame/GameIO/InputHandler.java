@@ -1,5 +1,6 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
+import com.github.jtesfaye.sosgame.GameEvent.InputEvent;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import lombok.Getter;
 

@@ -1,5 +1,6 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Intersector;
@@ -7,48 +8,61 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.github.jtesfaye.sosgame.GameEvent.InputEvent;
+import com.github.jtesfaye.sosgame.GameEvent.turnChangeEvent;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
+import com.github.jtesfaye.sosgame.GameObject.Move;
+import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.util.GameEventProcessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class GdxInput extends InputAdapter {
 
     private final PerspectiveCamera camera;
     private final ArrayList<ArrayList<ModelInstance>> tiles;
 
-    private Map<UUID, ClickInputHandler> handlers;
     private final int row;
     private final int height;
     private Player currentPlayer;
-    private final GameLogic logic;
+
+    private final GameEventProcessor p;
 
     public GdxInput(
         PerspectiveCamera c,
         ArrayList<ArrayList<ModelInstance>> t,
-        ArrayList<ClickInputHandler> handlers,
-        GameLogic logic) {
+        GameEventProcessor p) {
 
         super();
+        this.p = p;
         camera = c;
         tiles = t;
-        this.logic = logic;
         row = t.size();
         height = t.get(0).size();
-        this.handlers = new HashMap<>();
 
-        for (ClickInputHandler h : handlers) {
-            this.handlers.put(h.playerId, h);
-        }
+        p.addSubscriber(turnChangeEvent.class, this::onTurnChange);
+    }
 
-        currentPlayer = logic.getCurrentTurn();
+    public void onTurnChange(turnChangeEvent e) {
+
+        Runnable r = () -> {
+            this.currentPlayer = e.upcomingPlayer;
+        };
+
+        Gdx.app.postRunnable(r);
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
+        if (currentPlayer != null && currentPlayer.getPlayerType() != Player.Type.Human) {
+            return false;
+        }
 
         Ray ray = camera.getPickRay(screenX, screenY);
 
@@ -61,11 +75,16 @@ public class GdxInput extends InputAdapter {
                 tile.calculateBoundingBox(bounds);
                 bounds.mul(tile.transform);
 
-                if (Intersector.intersectRayBoundsFast(ray, bounds)
-                    && currentPlayer.getPlayerType().equals(Player.Type.Human)) {
+                if (Intersector.intersectRayBoundsFast(ray, bounds)) {
 
-                    handlers.get(currentPlayer.getPlayerId()).handleClick(r, c, button == Input.Buttons.LEFT);
-                    currentPlayer = logic.getCurrentTurn();
+                    Piece piece = button == Input.Buttons.LEFT ? Piece.sPiece : Piece.oPiece;
+
+                    if (currentPlayer == null) {
+                        p.addEvent(new InputEvent(new Move(r, c, piece)));
+                        return true;
+                    }
+
+                    p.addEvent(new InputEvent(new Move(r, c, piece), currentPlayer.getPlayerId()));
                     return true;
                 }
             }

@@ -1,11 +1,10 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
+import com.github.jtesfaye.sosgame.GameEvent.InputEvent;
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class ClickInputHandler extends InputHandler {
 
@@ -13,9 +12,8 @@ public class ClickInputHandler extends InputHandler {
         super(playerId, InputType.PassiveIO);
     }
 
-    public void handleClick(int row, int col, boolean isLeft) {
+    public void handleClick(int row, int col, Piece piece) {
 
-        Piece piece = isLeft ? Piece.sPiece : Piece.oPiece;
         consumer.accept(new InputEvent(new Move(row, col, piece), playerId));
 
     }

@@ -1,5 +1,6 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
+import com.github.jtesfaye.sosgame.GameEvent.InputEvent;
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.gameStrategy.GameStrategy;
