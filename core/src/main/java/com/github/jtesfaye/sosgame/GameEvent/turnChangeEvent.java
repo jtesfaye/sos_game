@@ -1,4 +1,13 @@
 package com.github.jtesfaye.sosgame.GameEvent;
 
-public class turnChangeEvent {
+import com.github.jtesfaye.sosgame.GameObject.Player;
+
+public class turnChangeEvent extends GameEvent {
+
+    public Player upcomingPlayer;
+
+    public turnChangeEvent(Player upcomingPlayer) {
+        this.upcomingPlayer = upcomingPlayer;
+    }
+
 }

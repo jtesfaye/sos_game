@@ -2,14 +2,19 @@ package com.github.jtesfaye.sosgame.GameEvent;
 
 import com.github.jtesfaye.sosgame.GameObject.Player;
 
-public class WinnerEvent extends GameEvent {
+public class EndGameEvent extends GameEvent {
 
+    public final Player player;
+    public String message;
 
-    public String message = "Winner: ";
+    public EndGameEvent(Player player) {
 
-    public WinnerEvent(Player player) {
-        super(EventType.DeclareWinner);
-        
-        message += player.toString();
+        this.player = player;
+
+        if (player != null) {
+            message = "Winner: " + player.toString();
+        } else {
+            message = "Tie";
+        }
     }
 }

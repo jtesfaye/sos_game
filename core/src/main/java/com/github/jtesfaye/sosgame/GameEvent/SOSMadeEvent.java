@@ -14,7 +14,6 @@ public class SOSMadeEvent extends GameEvent {
     public final Pair<Integer,Integer> tile3;
 
     public SOSMadeEvent(ArrayList<Pair<Integer, Integer>> tiles, Color color) {
-        super(EventType.SOSMade);
 
         tile1 = tiles.get(0);
         tile2 = tiles.get(1);

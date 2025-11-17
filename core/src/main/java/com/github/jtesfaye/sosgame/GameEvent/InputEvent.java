@@ -1,18 +1,21 @@
-package com.github.jtesfaye.sosgame.GameIO;
+package com.github.jtesfaye.sosgame.GameEvent;
 
 import com.github.jtesfaye.sosgame.GameObject.Move;
-import com.github.jtesfaye.sosgame.GameObject.Piece;
 import lombok.Getter;
 
-import java.util.Optional;
 import java.util.UUID;
 
-public class InputEvent {
+public class InputEvent extends GameEvent {
 
     public InputEvent(Move move, UUID playerId) {
 
         this.move = move;
         this.playerId = playerId;
+    }
+
+    public InputEvent(Move move) {
+        this.move = move;
+        this.playerId = null;
     }
 
     @Getter

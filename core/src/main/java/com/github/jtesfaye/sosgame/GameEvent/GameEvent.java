@@ -1,21 +1,8 @@
 package com.github.jtesfaye.sosgame.GameEvent;
 
+import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.util.Pair;
 import lombok.Getter;
 
 public abstract class GameEvent {
-
-    public enum EventType {
-        PieceSet, //Tell screen to render an S or O
-        SOSMade, //Tell screen to render a line over a newly made SOS
-        DeclareWinner, //End game declaring who won and who lost
-        Tie
-    };
-
-    @Getter
-    private final EventType event;
-
-    protected GameEvent(EventType event) {
-        this.event = event;
-    }
-
 }

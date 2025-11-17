@@ -9,7 +9,6 @@ public class PieceSetEvent extends GameEvent {
     public final Piece piece;
 
     public PieceSetEvent(int row, int col, Piece piece) {
-        super(EventType.PieceSet);
         this.row = row;
         this.col = col;
         this.piece = piece;
