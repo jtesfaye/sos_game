@@ -17,6 +17,10 @@ import java.util.ArrayList;
 public class MenuInitializer {
 
     private final String[] colors = {"RED", "BLUE", "PURPLE", "GREEN", "GOLD"};
+    private final String[] boardSizes = {"3x3", "4x4", "5x5","6x6", "7x7", "8x8","9x9"};
+    private final String[] modes = {"General", "Simple"};
+    private final String[] playerTypes = {"Computer", "Human", "LLM"};
+    private final String[] difficulties = {"Easy", "Medium", "Hard"};
 
     @Getter
     private TextButton startButton;
@@ -28,7 +32,10 @@ public class MenuInitializer {
     private SelectBox<String> modeChoice;
 
     @Getter
-    private SelectBox<String> opponentChoice;
+    private SelectBox<String> p1Choice;
+
+    @Getter
+    private SelectBox<String> p2Choice;
 
     @Getter
     private SelectBox<String> player1ColorChoice;
@@ -36,7 +43,8 @@ public class MenuInitializer {
     @Getter
     private SelectBox<String> player2ColorChoice;
 
-    private Label p2ColorLabel;
+    @Getter
+    private SelectBox<String> difficultyChoice;
 
     public Stage createStage(Skin skin) {
 
@@ -49,75 +57,21 @@ public class MenuInitializer {
         table.add(initTitle(skin)).colspan(2).padBottom(20);
         table.row();
 
-        table.add(initBoardSizeLabel(skin)).padRight(10);
-        boardSizeChoice = new SelectBox<>(skin);
-        boardSizeChoice.setItems("3x3", "4x4", "5x5","6x6", "7x7", "8x8","9x9");
-        table.add(boardSizeChoice).padBottom(15);
+        setChoice(table, initBoardSizeLabel(skin), skin, boardSizes, boardSizeChoice);
+        setChoice(table, initGameModeLabel(skin), skin, modes, modeChoice);
+        setChoice(table, playerSelectLabel(skin, 1), skin, playerTypes, p1Choice);
+        setChoice(table, initColorSelectLabel(skin, 1), skin, colors, player1ColorChoice);
+        setChoice(table, initColorSelectLabel(skin, 2), skin, colors, player2ColorChoice);
+        setChoice(table, playerSelectLabel(skin, 2), skin, playerTypes, p2Choice);
+        setChoice(table, getDifficultyChoiceLabel(skin), skin, difficulties, difficultyChoice);
         table.row();
 
-        table.add(initGameModeLabel(skin)).padRight(10);
-        modeChoice = new SelectBox<>(skin);
-        modeChoice.setItems("General", "Simple");
-        table.add(modeChoice).padBottom(15);
-        table.row();
-
-        table.add(initOpponentTypeLabel(skin)).padRight(10);
-        opponentChoice = new SelectBox<>(skin);
-        opponentChoice.setItems("Computer", "Human", "LLM");
-        table.add(opponentChoice).padBottom(15);
-        table.row();
-
-        table.add(initColorSelectLabel(skin, 1)).padRight(10);
-        player1ColorChoice = new SelectBox<>(skin);
-        player1ColorChoice.setItems(colors);
-        table.add(player1ColorChoice).padBottom(15);
-        table.row();
-
-
-        opponentChoice.addListener(new ChangeListener() {
+        p1Choice.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                if (p1Choice.getSelected() == "Computer") {
 
-                if ("Human".equals(opponentChoice.getSelected())) {
-
-                    if (player2ColorChoice != null) {
-                        return;
-                    }
-
-                    if (startButton.hasParent()) startButton.remove();
-
-                    table.row();
-
-                    p2ColorLabel = initColorSelectLabel(skin, 2);
-                    table.add(p2ColorLabel).padRight(10);
-                    player2ColorChoice = new SelectBox<>(skin);
-                    setPlayer2ColorChoice();
-                    table.add(player2ColorChoice).padBottom(15);
-                    table.row();
-
-                    table.add(startButton).colspan(2).padTop(20);
-
-                } else {
-
-                    if (player2ColorChoice == null) return;
-                    if (player2ColorChoice.hasParent()) {
-                        player2ColorChoice.remove();
-                        p2ColorLabel.remove();
-                        player2ColorChoice = null;
-                        p2ColorLabel = null;
-                    }
                 }
-            }
-        });
-
-        player1ColorChoice.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-
-                if (player2ColorChoice == null) {
-                    return;
-                }
-                setPlayer2ColorChoice();
             }
         });
 
@@ -155,28 +109,24 @@ public class MenuInitializer {
         return new Label("Game Mode:", skin);
     }
 
-    private Label initOpponentTypeLabel(Skin skin) {
-        return new Label("Select opponent: ", skin);
+    private Label playerSelectLabel(Skin skin, int num) {
+        return new Label("Select Player " + num + ": ", skin);
     }
 
     private Label initColorSelectLabel(Skin skin, int playerNum) {
         return new Label("Player " + playerNum + " select a color:", skin);
     }
 
-    private void setPlayer2ColorChoice() {
-
-        ArrayList<String> p2Colors = new ArrayList<>();
-
-        for (int i = 0; i < colors.length; i++) {
-
-            if (player1ColorChoice.getSelected().equals(colors[i])) {
-                continue;
-            }
-
-            p2Colors.add(colors[i]);
-
-        }
-
-        player2ColorChoice.setItems(p2Colors.toArray(new String[0]));
+    private Label getDifficultyChoiceLabel(Skin skin) {
+        return new Label("Select difficulty: ", skin);
     }
+
+    private void setChoice(Table table, Label label, Skin skin, String[] choices, SelectBox<String> option) {
+        table.add(label).padRight(10);
+        option = new SelectBox<>(skin);
+        option.setItems(choices);
+        table.add(option).padBottom(15);
+        table.row();
+    }
+
 }
