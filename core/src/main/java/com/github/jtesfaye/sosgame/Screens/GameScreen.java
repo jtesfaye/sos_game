@@ -91,6 +91,7 @@ public class GameScreen implements Screen {
         GdxInput inputProcessor = new GdxInput(camera, tileInstances, game.getProcessor());
 
         Gdx.input.setInputProcessor(inputProcessor);
+        game.getProcessor().addEvent(new onNextTurnEvent()); //Tells eventProcessor to start the game
 
     }
 
@@ -315,7 +316,8 @@ public class GameScreen implements Screen {
     @Override
     public void hide() {
 
-        
+        game.getProcessor().stopRunning();
+        game.getEventProcessorThread().shutdown();
 
     }
 }

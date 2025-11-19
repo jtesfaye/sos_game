@@ -22,7 +22,8 @@ public class Main extends Game {
     private GameEventProcessor processor;
 
     @Getter
-    private final ExecutorService eventProcessorThread = Executors.newSingleThreadExecutor();
+    @Setter
+    private ExecutorService eventProcessorThread;
 
     @Override
     public void create() {

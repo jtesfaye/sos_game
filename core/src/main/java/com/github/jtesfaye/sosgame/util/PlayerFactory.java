@@ -11,9 +11,9 @@ public class PlayerFactory {
             case "Human":
                 return new Player(Player.Type.Human, color, displayName);
             case "Computer":
-                return new Player(Player.Type.Computer, color, displayName);
+                return new Player(Player.Type.Computer, color, "Computer");
             case "LLM":
-                return new Player(Player.Type.LLM, color, displayName);
+                return new Player(Player.Type.LLM, color, "LLM");
             default:
                 throw new RuntimeException("Invalid player type given");
         }

@@ -1,6 +1,10 @@
 package com.github.jtesfaye.sosgame.util;
 
 import com.github.jtesfaye.sosgame.GameEvent.*;
+import com.github.jtesfaye.sosgame.GameIO.InputRouter;
+import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
+import lombok.Setter;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Condition;
@@ -17,6 +21,7 @@ public class GameEventProcessor {
     private final Lock lock = new ReentrantLock();
     private final Condition cond = lock.newCondition();
     private Map<Class<? extends GameEvent>, List<Consumer<?>>> subscribers;
+    private boolean endGame = false;
 
     public GameEventProcessor(ConcurrentLinkedQueue<GameEvent> queue) {
 
@@ -59,13 +64,13 @@ public class GameEventProcessor {
                     cond.await();
                 }
 
-                if (!keep_going) {
-                    break;
-                }
-
                 while (!queue.isEmpty()) {
                     GameEvent e = queue.remove();
                     processEvent(e);
+                }
+
+                if (!keep_going) {
+                    break;
                 }
 
             } finally {
@@ -83,13 +88,17 @@ public class GameEventProcessor {
 
     private void processEvent(GameEvent event) {
 
-        if (event == null) {
+        if (event == null || endGame) {
             return;
         }
 
         List<Consumer<?>> consumers = subscribers.get(event.getClass());
         if (consumers != null) {
             for (Consumer<?> c : consumers) {
+
+                if (c.getClass().isInstance(EndGameEvent.class)) {
+                    endGame = true;
+                }
                 ((Consumer<GameEvent>) c).accept(event);
             }
         }

@@ -100,7 +100,7 @@ public abstract class GameLogic {
 
                 int playerIndex = getWinner();
                 System.out.println(playerIndex);
-
+                currentPlayerIndex = -1;
                 if (playerIndex == -1) {
 
                     p.addEvent(new EndGameEvent(null));
@@ -150,7 +150,9 @@ public abstract class GameLogic {
     }
 
     public Player getCurrentTurn() {
-
+        if (currentPlayerIndex == -1) {
+            return null;
+        }
         return players[currentPlayerIndex];
     }
 

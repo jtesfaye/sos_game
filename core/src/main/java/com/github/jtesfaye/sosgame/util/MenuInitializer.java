@@ -19,7 +19,7 @@ public class MenuInitializer {
     private final String[] colors = {"RED", "BLUE", "PURPLE", "GREEN", "GOLD"};
     private final String[] boardSizes = {"3x3", "4x4", "5x5","6x6", "7x7", "8x8","9x9"};
     private final String[] modes = {"General", "Simple"};
-    private final String[] playerTypes = {"Computer", "Human", "LLM"};
+    private final String[] playerTypes = {"Human", "Computer", "LLM"};
     private final String[] difficulties = {"Easy", "Medium", "Hard"};
 
     @Getter
@@ -46,6 +46,8 @@ public class MenuInitializer {
     @Getter
     private SelectBox<String> difficultyChoice;
 
+    private Label difficultyLabel;
+
     public Stage createStage(Skin skin) {
 
         Stage stage = new Stage(new ScreenViewport());
@@ -54,22 +56,83 @@ public class MenuInitializer {
         table.setFillParent(true);
         stage.addActor(table);
 
-        table.add(initTitle(skin)).colspan(2).padBottom(20);
+        table.add(title(skin)).colspan(2).padBottom(20);
         table.row();
 
-        setChoice(table, initBoardSizeLabel(skin), skin, boardSizes, boardSizeChoice);
-        setChoice(table, initGameModeLabel(skin), skin, modes, modeChoice);
-        setChoice(table, playerSelectLabel(skin, 1), skin, playerTypes, p1Choice);
-        setChoice(table, initColorSelectLabel(skin, 1), skin, colors, player1ColorChoice);
-        setChoice(table, initColorSelectLabel(skin, 2), skin, colors, player2ColorChoice);
-        setChoice(table, playerSelectLabel(skin, 2), skin, playerTypes, p2Choice);
-        setChoice(table, getDifficultyChoiceLabel(skin), skin, difficulties, difficultyChoice);
+        table.add(boardSizeLabel(skin)).padRight(10);
+        boardSizeChoice = new SelectBox<>(skin);
+        boardSizeChoice.setItems(boardSizes);
+        table.add(boardSizeChoice).padBottom(15);
+        table.row();
+
+        table.add(gameModeLabel(skin)).padRight(10);
+        modeChoice = new SelectBox<>(skin);
+        modeChoice.setItems(modes);
+        table.add(modeChoice).padBottom(15);
+        table.row();
+
+        table.add(playerSelectLabel(skin, 1)).padRight(10);
+        p1Choice = new SelectBox<>(skin);
+        p1Choice.setItems(playerTypes);
+        table.add(p1Choice).padBottom(15);
+        table.row();
+
+        table.add(colorSelectLabel(skin, 1)).padRight(10);
+        player1ColorChoice = new SelectBox<>(skin);
+        player1ColorChoice.setItems(colors);
+        table.add(player1ColorChoice).padBottom(15);
+        table.row();
+
+        table.add(playerSelectLabel(skin, 2)).padRight(10);
+        p2Choice = new SelectBox<>(skin);
+        p2Choice.setItems(playerTypes);
+        table.add(p2Choice).padBottom(15);
+        table.row();
+
+        table.add(colorSelectLabel(skin, 1)).padRight(10);
+        player2ColorChoice = new SelectBox<>(skin);
+        player2ColorChoice.setItems(colors);
+        table.add(player2ColorChoice).padBottom(15);
+        table.row();
+
         table.row();
 
         p1Choice.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (p1Choice.getSelected() == "Computer") {
+                if (p1Choice.getSelected().equals("Computer")  && difficultyChoice == null) {
+
+                    difficultyLabel = difficultyChoiceLabel(skin);
+                    table.add(difficultyLabel).padRight(10);
+                    difficultyChoice = new SelectBox<>(skin);
+                    difficultyChoice.setItems(difficulties);
+                    table.add(difficultyChoice).padBottom(15);
+                    table.row();
+                } else if (!(p1Choice.getSelected().equals("Computer") || difficultyChoice == null)) {
+                    difficultyChoice.remove();
+                    difficultyLabel.remove();
+                    difficultyChoice = null;
+                    difficultyLabel = null;
+
+                }
+            }
+        });
+
+        p2Choice.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (p2Choice.getSelected().equals("Computer") && difficultyChoice == null) {
+
+                    table.add(difficultyChoiceLabel(skin)).padRight(10);
+                    difficultyChoice = new SelectBox<>(skin);
+                    difficultyChoice.setItems(difficulties);
+                    table.add(difficultyChoice).padBottom(15);
+                    table.row();
+                } else if (!(p2Choice.getSelected().equals("Computer") || difficultyChoice == null)) {
+                    difficultyChoice.remove();
+                    difficultyLabel.remove();
+                    difficultyChoice = null;
+                    difficultyLabel = null;
 
                 }
             }
@@ -97,15 +160,15 @@ public class MenuInitializer {
         return menuButton;
     }
 
-    private Label initTitle(Skin skin) {
+    private Label title(Skin skin) {
         return new Label("SOS", skin);
     }
 
-    private Label initBoardSizeLabel(Skin skin) {
+    private Label boardSizeLabel(Skin skin) {
         return new Label("Board Size:", skin);
     }
 
-    private Label initGameModeLabel(Skin skin) {
+    private Label gameModeLabel(Skin skin) {
         return new Label("Game Mode:", skin);
     }
 
@@ -113,20 +176,12 @@ public class MenuInitializer {
         return new Label("Select Player " + num + ": ", skin);
     }
 
-    private Label initColorSelectLabel(Skin skin, int playerNum) {
+    private Label colorSelectLabel(Skin skin, int playerNum) {
         return new Label("Player " + playerNum + " select a color:", skin);
     }
 
-    private Label getDifficultyChoiceLabel(Skin skin) {
+    private Label difficultyChoiceLabel(Skin skin) {
         return new Label("Select difficulty: ", skin);
-    }
-
-    private void setChoice(Table table, Label label, Skin skin, String[] choices, SelectBox<String> option) {
-        table.add(label).padRight(10);
-        option = new SelectBox<>(skin);
-        option.setItems(choices);
-        table.add(option).padBottom(15);
-        table.row();
     }
 
 }

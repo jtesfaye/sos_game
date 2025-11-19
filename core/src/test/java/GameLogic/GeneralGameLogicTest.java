@@ -1,114 +1,166 @@
 package GameLogic;
 
+import com.badlogic.gdx.graphics.Color;
 import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
 import com.github.jtesfaye.sosgame.GameEvent.SOSMadeEvent;
-import com.github.jtesfaye.sosgame.GameEvent.WinnerEvent;
+import com.github.jtesfaye.sosgame.GameEvent.EndGameEvent;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 
-import com.github.jtesfaye.sosgame.GameLogic.Piece;
-import com.github.jtesfaye.sosgame.GameLogic.Player;
+import com.github.jtesfaye.sosgame.GameObject.Piece;
+import com.github.jtesfaye.sosgame.GameObject.Player;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.github.jtesfaye.sosgame.GameObject.Move;
+import com.github.jtesfaye.sosgame.util.GameEventProcessor;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class GeneralGameLogicTest {
 
-    public GameLogic logic = GameLogicFactory.createGameLogic(3,3, "General", "Human");
+    public static Player[] players = {
+        new Player(Player.Type.Human, Color.RED, "P1"),
+        new Player(Player.Type.Human, Color.RED, "P2")
+    };
+
 
     @Test
     public void Player1WinnerTest() {
+        GameEventProcessor p = new GameEventProcessor(new ConcurrentLinkedQueue<>());
+        GameLogic logic = GameLogicFactory.createGameLogic(3, 3, players, "General", p);
 
-        GameEvent e = null;
+        final boolean[] flag = {false};
+
+        Consumer<EndGameEvent> consumer = (e) -> {
+            if (e.player.toString().equals("Player 1")) {
+                flag[0] = true;
+            }
+        };
+
+        p.addSubscriber(EndGameEvent.class, consumer);
+
+        ExecutorService thread = Executors.newSingleThreadExecutor();
+        thread.execute(() -> {
+            try {
+                p.run();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         //Simulate game
-        logic.setPiece(0,0 , Piece.sPiece); //Player 1
-        e = logic.getChanges();
+        logic.applyMove(new Move(0, 0, Piece.sPiece));
+        logic.applyMove(new Move(1, 0, Piece.oPiece));
+        logic.applyMove(new Move(2, 0, Piece.sPiece));
 
-        logic.setPiece(1,0 , Piece.oPiece); //Player 2
-        e = logic.getChanges();
-        logic.setPiece(2,0 , Piece.sPiece); //PLayer 1 should score with this move
-        e = logic.getChanges();
-        e = logic.getChanges();
+        logic.applyMove(new Move(0, 1, Piece.sPiece));
+        logic.applyMove(new Move(0, 2, Piece.sPiece));
+        logic.applyMove(new Move(1, 1, Piece.sPiece));
+        logic.applyMove(new Move(1, 2, Piece.sPiece));
+        logic.applyMove(new Move(2, 1, Piece.sPiece));
+        logic.applyMove(new Move(2, 2, Piece.sPiece));
 
-        //Place a piece on every other tile to signify end of game
-        logic.setPiece(0,1 , Piece.sPiece);
-        e = logic.getChanges();
-        logic.setPiece(0,2 , Piece.sPiece);
-        e = logic.getChanges();
-        logic.setPiece(1,1 , Piece.sPiece);
-        e = logic.getChanges();
-        logic.setPiece(1,2 , Piece.sPiece);
-        e = logic.getChanges();
-        logic.setPiece(2,1 , Piece.sPiece);
-        e = logic.getChanges();
-        logic.setPiece(2,2 , Piece.sPiece);
-        e = logic.getChanges();
+        p.stopRunning();
+        thread.shutdown();
+        try {
+            if (thread.awaitTermination(100, TimeUnit.MILLISECONDS)) {
+                thread.shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
 
-        e = logic.getChanges();
-
-        assertInstanceOf(WinnerEvent.class, e);
-
-        WinnerEvent w = (WinnerEvent) e;
-        assertEquals("Player 1", w.player.toString());
-
+        assertTrue(flag[0]);
     }
 
     @Test
     public void Player2WinnerTest() {
-        GameEvent e = null;
+        GameEventProcessor p = new GameEventProcessor(new ConcurrentLinkedQueue<>());
+        GameLogic logic = GameLogicFactory.createGameLogic(3, 3, players, "General", p);
+
+        final boolean[] flag = {false};
+
+        Consumer<EndGameEvent> consumer = (e) -> {
+            if (e.player.toString().equals("Player 2")) {
+                flag[0] = true;
+            }
+        };
+
+        p.addSubscriber(EndGameEvent.class, consumer);
+
+        ExecutorService thread = Executors.newSingleThreadExecutor();
+        thread.execute(() -> {
+            try {
+                p.run();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         //Simulate game
-        logic.setPiece(0,0 , Piece.sPiece); //Player 1
-        e = logic.getChanges();
+        logic.applyMove(new Move(0, 0, Piece.sPiece));
+        logic.applyMove(new Move(1, 0, Piece.oPiece));
+        logic.applyMove(new Move(0, 1, Piece.sPiece));
+        logic.applyMove(new Move(2, 0, Piece.sPiece));
+        logic.applyMove(new Move(1, 1, Piece.sPiece));
+        logic.applyMove(new Move(0, 2, Piece.sPiece));
+        logic.applyMove(new Move(1, 2, Piece.sPiece));
+        logic.applyMove(new Move(2, 1, Piece.sPiece));
+        logic.applyMove(new Move(2, 2, Piece.sPiece));
 
-        logic.setPiece(1,0 , Piece.oPiece); //Player 2
-        e = logic.getChanges();
+        p.stopRunning();
+        thread.shutdown();
+        try {
+            if (thread.awaitTermination(100, TimeUnit.MILLISECONDS)) {
+                thread.shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
 
-        logic.setPiece(0,1 , Piece.sPiece); //PLayer 1
-        e = logic.getChanges();
-
-        logic.setPiece(2,0 , Piece.sPiece); //PLayer 2 should score with this move
-        e = logic.getChanges();
-        e = logic.getChanges();
-
-        logic.setPiece(1,1 , Piece.sPiece); //PLayer 1
-        e = logic.getChanges();
-
-        logic.setPiece(0,2 , Piece.sPiece); //Player 2
-        e = logic.getChanges();
-
-        logic.setPiece(1,2 , Piece.sPiece);
-        e = logic.getChanges();
-
-        logic.setPiece(2,1 , Piece.sPiece);
-        e = logic.getChanges();
-
-        logic.setPiece(2,2 , Piece.sPiece);
-        e = logic.getChanges();
-
-        e = logic.getChanges();
-
-        assertInstanceOf(WinnerEvent.class, e);
-        WinnerEvent w = (WinnerEvent) e;
-
-        assertEquals("Player 2", w.player.toString());
-
+        assertTrue(flag[0]);
     }
 
     @Test
     public void ScoreDoesntTransitionTurnTest() {
+        GameEventProcessor p = new GameEventProcessor(new ConcurrentLinkedQueue<>());
+        GameLogic logic = GameLogicFactory.createGameLogic(3, 3, players, "General", p);
 
-        String currentTurn = logic.getCurrentTurn().toString();
+        final String startingTurn = logic.getCurrentTurn().toString();
 
-        logic.setPiece(0,0 , Piece.sPiece); //Player 1
-        logic.setPiece(1,0 , Piece.oPiece); //Player 2
-        logic.setPiece(2,0 , Piece.sPiece); //PLayer 1 should score with this move
+        ExecutorService thread = Executors.newSingleThreadExecutor();
+        thread.execute(() -> {
+            try {
+                p.run();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
-        String turnAfterScore = logic.getCurrentTurn().toString();
+        //Simulate scoring sequence
+        logic.applyMove(new Move(0, 0, Piece.sPiece));
+        logic.applyMove(new Move(1, 0, Piece.oPiece));
+        logic.applyMove(new Move(2, 0, Piece.sPiece));
 
-        assertEquals(currentTurn, turnAfterScore);
+        final String endingTurn = logic.getCurrentTurn().toString();
 
+        p.stopRunning();
+        thread.shutdown();
+        try {
+            if (thread.awaitTermination(100, TimeUnit.MILLISECONDS)) {
+                thread.shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        assertEquals(startingTurn, endingTurn);
     }
 }

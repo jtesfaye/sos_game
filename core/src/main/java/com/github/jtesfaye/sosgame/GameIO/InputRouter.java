@@ -1,6 +1,7 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
 import com.github.jtesfaye.sosgame.GameEvent.InputEvent;
+import com.github.jtesfaye.sosgame.GameEvent.onNextTurnEvent;
 import com.github.jtesfaye.sosgame.GameEvent.turnChangeEvent;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.GameObject.Player;
@@ -25,7 +26,7 @@ public class InputRouter {
         this.p = p;
 
         p.addSubscriber(InputEvent.class, this::onInputEvent);
-
+        p.addSubscriber(onNextTurnEvent.class, this::onNextTurn);
     }
 
     public void registerHandler(InputHandler handler) {
@@ -35,15 +36,14 @@ public class InputRouter {
 
     }
 
-    private void onNextTurn() {
+    private void onNextTurn(onNextTurnEvent e) {
 
         Player currentPlayer = logic.getCurrentTurn();
-        InputHandler handler = handlers.get(currentPlayer.getPlayerId());
-
-        if (handler.inputType == InputHandler.InputType.PassiveIO) {
+        if (currentPlayer == null) {
             return;
         }
 
+        InputHandler handler = handlers.get(currentPlayer.getPlayerId());
         handler.getInput(logic.getBoard());
 
     }
@@ -51,6 +51,9 @@ public class InputRouter {
     private void onInputEvent(InputEvent e) {
 
         Player currentPlayer = logic.getCurrentTurn();
+        if (currentPlayer == null) {
+            return;
+        }
 
         //if null it means it was the starting move of the game
         if (e.getPlayerId() == null) {
@@ -62,6 +65,6 @@ public class InputRouter {
 
         logic.applyMove(e.getMove());
 
-        onNextTurn();
+        p.addEvent(new onNextTurnEvent());
     }
 }

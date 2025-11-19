@@ -24,9 +24,12 @@ import com.github.jtesfaye.sosgame.GameObject.Player;
 import com.github.jtesfaye.sosgame.Main;
 import com.github.jtesfaye.sosgame.Screens.GameScreen;
 import com.github.jtesfaye.sosgame.gameStrategy.EasyGameStrategy;
+import com.github.jtesfaye.sosgame.gameStrategy.HardGameStrategy;
+import com.github.jtesfaye.sosgame.gameStrategy.MediumGameStrategy;
 
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -38,9 +41,11 @@ public class GameInitializer {
     public static NewGameInit initGame(
         String boardSize,
         String gameMode,
-        String opponent,
+        String p1,
+        String p2,
         String p1Color,
         String p2Color,
+        String difficulty,
         Main mGame) {
 
         Pair<Integer, Integer> dimensions = utilFunctions.getBoardDimensions(boardSize);
@@ -48,14 +53,11 @@ public class GameInitializer {
         width = dimensions.first;
         height = dimensions.second;
 
-        Player[] players = {
-            PlayerFactory.createPlayer("Human", getColor(p1Color), "Player 1"),
-            PlayerFactory.createPlayer(opponent, getColor(p2Color), "Player 2")
-        };
+        Player[] players = createPlayers(p1, p2, p1Color, p2Color);
 
         GameLogic logic = GameLogicFactory.createGameLogic(width, height, players, gameMode, mGame.getProcessor());
 
-        InputRouter router = initializeInputRouter(logic, players, mGame.getProcessor());
+        InputRouter router = initializeInputRouter(logic, players, difficulty,mGame.getProcessor());
 
         BoardBuilder builder = new BoardBuilder(width, height);
 
@@ -65,17 +67,47 @@ public class GameInitializer {
         return new NewGameInit(logic, router, screen);
     }
 
-    private static InputRouter initializeInputRouter(GameLogic logic, Player[] players, GameEventProcessor p) {
+    private static Player[] createPlayers(String p1Type, String p2Type, String p1Color, String p2Color) {
 
-        ClickInputHandler player1ClickHandler = new ClickInputHandler(players[0].getPlayerId());
-        InputHandler opponentInputHandler = null;
+        return new Player[] {
+            PlayerFactory.createPlayer(p1Type, getColor(p1Color), "Player 1"),
+            PlayerFactory.createPlayer(p2Type, getColor(p2Color), "Player 2")
+        };
+    }
+
+    private static InputRouter initializeInputRouter(GameLogic logic, Player[] players, String diff ,GameEventProcessor p) {
+
+        InputHandler p1handler, p2handler;
+
+        switch (players[0].getPlayerType()) {
+            case Human:
+                p1handler = new ClickInputHandler(players[0].getPlayerId());
+                break;
+            case Computer:
+                p1handler = setComputerHandler(players[0], diff);
+                if (p1handler == null) {
+                    throw new RuntimeException("ComputerInputHandler is null");
+                }
+                break;
+            case LLM:
+                p1handler = new LLMInputHandler(players[0].getPlayerId());
+                break;
+            default:
+                throw new RuntimeException("Unrecognized player type");
+        }
 
         switch (players[1].getPlayerType()) {
             case Human:
-                opponentInputHandler = new ClickInputHandler(players[1].getPlayerId());
+                p2handler = new ClickInputHandler(players[1].getPlayerId());
                 break;
             case Computer:
-                opponentInputHandler = new ComputerInputHandler(players[1].getPlayerId(), new EasyGameStrategy());
+                p2handler = setComputerHandler(players[1], diff);
+                if (p2handler == null) {
+                    throw new RuntimeException("ComputerInputHandler is null");
+                }
+                break;
+            case LLM:
+                p2handler = new LLMInputHandler(players[1].getPlayerId());
                 break;
             default:
                 throw new RuntimeException("Unrecognized player type");
@@ -83,8 +115,8 @@ public class GameInitializer {
 
         InputRouter router = new InputRouter(logic, p);
 
-        router.registerHandler(player1ClickHandler);
-        router.registerHandler(opponentInputHandler);
+        router.registerHandler(p1handler);
+        router.registerHandler(p2handler);
 
         return router;
     }
@@ -160,6 +192,26 @@ public class GameInitializer {
 
         return camera;
 
+    }
+
+    static private ComputerInputHandler setComputerHandler(Player p, String diff) {
+
+        switch (diff) {
+            case "Easy":
+
+                return new ComputerInputHandler(p.getPlayerId(), new EasyGameStrategy());
+
+            case "Medium":
+
+                return new ComputerInputHandler(p.getPlayerId(), new MediumGameStrategy());
+
+            case "Hard":
+
+                return new ComputerInputHandler(p.getPlayerId(), new HardGameStrategy());
+
+            default:
+                return null;
+        }
     }
 
     static private Color getColor(String color) {

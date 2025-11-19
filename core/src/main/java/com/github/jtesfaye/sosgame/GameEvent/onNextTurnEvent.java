@@ -1,4 +1,3 @@
 package com.github.jtesfaye.sosgame.GameEvent;
 
-public class onNextTurnEvent {
-}
+public class onNextTurnEvent extends GameEvent {}

@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.github.jtesfaye.sosgame.util.*;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
 
 public class MainMenuScreen implements Screen {
 
@@ -32,35 +33,39 @@ public class MainMenuScreen implements Screen {
 
                 String sizeSelected = menu.getBoardSizeChoice().getSelected();
                 String modeSelected = menu.getModeChoice().getSelected();
-                String opponentSelected = menu.getOpponentChoice().getSelected();
+                String p1Choice = menu.getP1Choice().getSelected();
+                String p2Choice = menu.getP2Choice().getSelected();
                 String player1Color = menu.getPlayer1ColorChoice().getSelected();
-                String player2Color = "";
+                String player2Color = menu.getPlayer2ColorChoice().getSelected();
+                String difficulty = "";
 
-
-                if (menu.getPlayer2ColorChoice() != null) {
-                    player2Color = menu.getPlayer2ColorChoice().getSelected();
-                };
-
+                if (menu.getDifficultyChoice() != null) {
+                    difficulty = menu.getDifficultyChoice().getSelected();
+                }
                 game.setQueue(new ConcurrentLinkedQueue<>());
                 game.setProcessor(new GameEventProcessor(game.getQueue()));
 
                 NewGameInit init = GameInitializer.initGame(
                     sizeSelected,
                     modeSelected,
-                    opponentSelected,
+                    p1Choice,
+                    p2Choice,
                     player1Color,
                     player2Color,
+                    difficulty,
                     game);
 
+                game.setEventProcessorThread(Executors.newSingleThreadExecutor());
                 game.getEventProcessorThread().execute(() -> {
+
                     try {
+
                         game.getProcessor().run();
+
                     } catch (InterruptedException e) {
                         return;
                     }
-
                 });
-
                 game.setScreen(init.screen);
             }
         });
@@ -102,6 +107,5 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void hide() {}
-
 
 }

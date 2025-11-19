@@ -12,12 +12,8 @@ public class ClickInputHandler extends InputHandler {
         super(playerId, InputType.PassiveIO);
     }
 
-    public void handleClick(int row, int col, Piece piece) {
-
-        consumer.accept(new InputEvent(new Move(row, col, piece), playerId));
-
-    }
-
     @Override
-    public void getInput(Piece[][] b) {}
+    public void getInput(Piece[][] b) {
+        return;
+    }
 }
