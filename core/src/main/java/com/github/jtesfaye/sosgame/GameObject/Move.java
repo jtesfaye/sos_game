@@ -1,18 +1,25 @@
 package com.github.jtesfaye.sosgame.GameObject;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.Setter;
 
 public class Move {
-    @Getter
-    private final int row;
 
     @Getter
-    private final int col;
+    private int row;
 
     @Getter
-    private final Piece piece;
+    private int col;
 
-    public Move(int r, int c, Piece p) {
+    @Getter
+    private Piece piece;
+
+    @JsonCreator
+    public Move(@JsonProperty("row") int r,
+                @JsonProperty("col") int c,
+                @JsonProperty("piece") Piece p) {
         row = r;
         col = c;
         piece = p;

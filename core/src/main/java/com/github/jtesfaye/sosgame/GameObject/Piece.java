@@ -1,5 +1,7 @@
 package com.github.jtesfaye.sosgame.GameObject;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum Piece {
 
     OPEN("_"),

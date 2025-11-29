@@ -1,7 +1,6 @@
-package com.github.jtesfaye.sosgame.util;
+package com.github.jtesfaye.sosgame.GameObject;
 
 import com.badlogic.gdx.graphics.Color;
-import com.github.jtesfaye.sosgame.GameObject.Player;
 
 public class PlayerFactory {
 
