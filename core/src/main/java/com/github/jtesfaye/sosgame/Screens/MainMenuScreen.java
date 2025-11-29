@@ -1,6 +1,9 @@
 package com.github.jtesfaye.sosgame.Screens;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.github.jtesfaye.sosgame.GameEvent.StartReplayEvent;
 import com.github.jtesfaye.sosgame.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -11,6 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.github.jtesfaye.sosgame.util.*;
 
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 
@@ -18,57 +24,20 @@ public class MainMenuScreen implements Screen {
 
     private final Stage stage;
     private final Main game;
-
+    private final Table homeScreen;
+    private final Table gameConfig;
     public MainMenuScreen(Main game) {
 
         this.game = game;
-        MenuInitializer menu = new MenuInitializer();
+        GameConfigure config = new GameConfigure();
         Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        stage = menu.createStage(skin);
+        stage = new Stage(new ScreenViewport());
 
-        menu.getStartButton().addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
+        homeScreen = homeScreenTable(skin);
+        gameConfig = config.gameConfig(skin, game);
 
-                String sizeSelected = menu.getBoardSizeChoice().getSelected();
-                String modeSelected = menu.getModeChoice().getSelected();
-                String p1Choice = menu.getP1Choice().getSelected();
-                String p2Choice = menu.getP2Choice().getSelected();
-                String player1Color = menu.getPlayer1ColorChoice().getSelected();
-                String player2Color = menu.getPlayer2ColorChoice().getSelected();
-                String difficulty = "";
-
-                if (menu.getDifficultyChoice() != null) {
-                    difficulty = menu.getDifficultyChoice().getSelected();
-                }
-                game.setQueue(new ConcurrentLinkedQueue<>());
-                game.setProcessor(new GameEventProcessor(game.getQueue()));
-
-                NewGameInit init = GameInitializer.initGame(
-                    sizeSelected,
-                    modeSelected,
-                    p1Choice,
-                    p2Choice,
-                    player1Color,
-                    player2Color,
-                    difficulty,
-                    game);
-
-                game.setEventProcessorThread(Executors.newSingleThreadExecutor());
-                game.getEventProcessorThread().execute(() -> {
-
-                    try {
-
-                        game.getProcessor().run();
-
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                });
-                game.setScreen(init.screen);
-            }
-        });
+        stage.addActor(homeScreen);
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -79,22 +48,21 @@ public class MainMenuScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(delta);
         stage.draw();
-
     }
 
     @Override
     public void resize(int width, int height) {
 
         stage.getViewport().update(width, height, true);
-
     }
 
     @Override
     public void dispose() {
 
         stage.dispose();
-
     }
+
+
 
     @Override
     public void show() {}
@@ -108,4 +76,101 @@ public class MainMenuScreen implements Screen {
     @Override
     public void hide() {}
 
+    private Table homeScreenTable(Skin skin) {
+
+        Table table = new Table(skin);
+        table.setFillParent(true);
+
+        TextButton newGameButton = new TextButton("New Game", skin);
+        newGameButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                stage.clear();
+                stage.addActor(gameConfig);
+            }
+        });
+
+        table.add(newGameButton).colspan(2).padTop(20);
+        table.row();
+
+        TextButton replay = new TextButton("Replay game", skin);
+
+        replay.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+
+                FileHandle startingDir = Gdx.files.local("replays/");
+                FileHandle[] files = startingDir.list();
+
+                Window window = new Window("Choose a file", skin);
+                window.setModal(true);
+                window.setMovable(false);
+                window.setFillParent(true);
+
+                Table fileTable = new Table(skin);
+                fileTable.top();
+                fileTable.defaults().fillX().pad(5);
+
+                for (FileHandle f : files) {
+                    if (!f.isDirectory() && f.extension().equals("json")) {
+                        TextButton fileButton = new TextButton(f.name(), skin);
+
+                        fileButton.addListener(new ChangeListener() {
+                            @Override
+                            public void changed(ChangeEvent changeEvent, Actor actor) {
+                                window.remove();
+                                System.out.println(f.name());
+                                startReplay(f);
+                            }
+                        });
+
+                        fileTable.row();
+                        fileTable.add(fileButton);
+                    }
+                }
+
+                ScrollPane scroll = new ScrollPane(fileTable, skin);
+                scroll.setFadeScrollBars(false);
+                window.add(scroll).grow();
+                stage.addActor(window);
+            }
+        });
+
+        table.add(replay).colspan(2).padTop(20);
+        table.row();
+
+        return table;
+    }
+
+    private void startReplay(FileHandle f) {
+
+        GameRecord record;
+        try {
+            record = EventReaderWriter.readFromJson(f.path());
+        } catch (IOException e) {
+            System.out.println("Here");
+            throw new RuntimeException(e.getMessage());
+        }
+
+        game.setQueue(new ConcurrentLinkedQueue<>());
+        game.setProcessor(new GameEventProcessor(game.getQueue(), true));
+
+        GameScreen screen = GameInitializer.setupReplay(record, game);
+
+        game.setEventProcessorThread(Executors.newSingleThreadExecutor());
+        game.getEventProcessorThread().execute(() -> {
+
+            try {
+
+                game.getProcessor().run();
+
+            } catch (InterruptedException e) {
+                return;
+            }
+        });
+
+        game.setScreen(screen);
+        game.getProcessor().addReplayEvents(record.events());
+        game.getProcessor().addEvent(new StartReplayEvent());
+    }
 }

@@ -3,8 +3,10 @@ package com.github.jtesfaye.sosgame.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.attributes.CubemapAttribute;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.g3d.*;
@@ -23,7 +25,6 @@ import com.github.jtesfaye.sosgame.GameIO.GdxInput;
 import com.github.jtesfaye.sosgame.Main;
 import com.github.jtesfaye.sosgame.util.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class GameScreen implements Screen {
@@ -48,11 +49,12 @@ public class GameScreen implements Screen {
     private final Label currentScoreLabel;
     private TextButton returnButton;
     private final Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+    private Cubemap skybox;
 
-    private final ScreenInit init;
+    private final ScreenConfig init;
     private final ArrayList<ModelInstance> modelsToRender;
 
-    public GameScreen(ScreenInit init, Main game) {
+    public GameScreen(ScreenConfig init, Main game) {
 
         this.game = game;
         this.init = init;
@@ -85,6 +87,18 @@ public class GameScreen implements Screen {
         env = GameInitializer.initEnvironment();
         camera = GameInitializer.initCamera(init.getBoardWidth(), init.getBoardHeight());
 
+        skybox = new Cubemap(
+            Gdx.files.internal("skybox/right.png"),
+            Gdx.files.internal("skybox/left.png"),
+            Gdx.files.internal("skybox/up.png"),
+            Gdx.files.internal("skybox/down.png"),
+            Gdx.files.internal("skybox/back.png"),
+            Gdx.files.internal("skybox/front.png")
+
+        );
+
+        env.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, skybox));
+
         tiles = builder.build(Color.WHITE, Color.GRAY);
         ArrayList <ArrayList<ModelInstance>> tileInstances = makeTileInstances();
 
@@ -98,10 +112,12 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
 
+        camera.update();
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
 
-        camera.update();
+        Gdx.gl.glDepthFunc(GL20.GL_LESS);
 
         modelBatch.begin(camera);
 
@@ -284,7 +300,7 @@ public class GameScreen implements Screen {
 
         if (returnButton == null) {
 
-            returnButton = MenuInitializer.getMainMenuButton(skin, game, this);
+            returnButton = GameConfigure.getMainMenuButton(skin, game, this);
             returnButton.setColor(Color.CYAN);
 
 
