@@ -55,16 +55,15 @@ public class InputRouter {
             return;
         }
 
-        //if null it means it was the starting move of the game
+        //if null, it means it was the starting move of the game
         if (e.getPlayerId() == null) {
             p.addEvent(new turnChangeEvent(currentPlayer));
         } else if (!e.getPlayerId().equals(currentPlayer.getPlayerId())) {
-            //If its not their turn, ignore players input
+            //If it's not their turn, ignore player's input
             return;
         }
 
         logic.applyMove(e.getMove());
-
         p.addEvent(new onNextTurnEvent());
     }
 }
