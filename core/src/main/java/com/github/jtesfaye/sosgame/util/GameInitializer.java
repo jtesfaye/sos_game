@@ -5,40 +5,34 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
 import com.github.jtesfaye.sosgame.BoardComponents.TileModel;
-import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
 import com.github.jtesfaye.sosgame.GameIO.*;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.GameObject.PlayerFactory;
 import com.github.jtesfaye.sosgame.Main;
 import com.github.jtesfaye.sosgame.Screens.GameScreen;
-import com.github.jtesfaye.sosgame.gameStrategy.EasyGameStrategy;
-import com.github.jtesfaye.sosgame.gameStrategy.HardGameStrategy;
-import com.github.jtesfaye.sosgame.gameStrategy.MediumGameStrategy;
+import com.github.jtesfaye.sosgame.computer.EasyGameStrategy;
+import com.github.jtesfaye.sosgame.computer.HardGameStrategy;
+import com.github.jtesfaye.sosgame.computer.MediumGameStrategy;
 
-
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Arrays;
 
 public class GameInitializer {
 
     private static int width;
     private static int height;
 
-    public static NewGameInit initGame(
+    public static NewGameConfig initGame(
         String boardSize,
         String gameMode,
         String p1,
@@ -61,10 +55,24 @@ public class GameInitializer {
 
         BoardBuilder builder = new BoardBuilder(width, height);
 
-        ScreenInit s =  new ScreenInit(width, height, builder, gameMode, logic.getOpponentName());
+        ScreenConfig s =  new ScreenConfig(width, height, builder, gameMode, logic.getOpponentName());
         GameScreen screen = new GameScreen(s, mGame);
 
-        return new NewGameInit(logic, router, screen);
+        EventReaderWriter rec = new EventReaderWriter(width, height, gameMode, Arrays.stream(players).toList());
+        mGame.getProcessor().setRecorder(rec);
+
+        return new NewGameConfig(logic, router, screen);
+    }
+
+    public static GameScreen setupReplay(GameRecord record, Main mGame) {
+
+        int row = record.boardDim().first;
+        int col = record.boardDim().second;
+        Player[] players = record.players().toArray(new Player[0]);
+        BoardBuilder builder = new BoardBuilder(row, col);
+        ScreenConfig s = new ScreenConfig(row, col, builder, record.gameMode(), players[1].getDescription());
+
+        return new GameScreen(s, mGame);
     }
 
     private static Player[] createPlayers(String p1Type, String p2Type, String p1Color, String p2Color) {
@@ -90,7 +98,7 @@ public class GameInitializer {
                 }
                 break;
             case LLM:
-                p1handler = new LLMInputHandler(players[0].getPlayerId());
+                p1handler = new LLMInputHandler(players[0].getPlayerId(), "");
                 break;
             default:
                 throw new RuntimeException("Unrecognized player type");
@@ -107,7 +115,7 @@ public class GameInitializer {
                 }
                 break;
             case LLM:
-                p2handler = new LLMInputHandler(players[1].getPlayerId());
+                p2handler = new LLMInputHandler(players[1].getPlayerId(), "");
                 break;
             default:
                 throw new RuntimeException("Unrecognized player type");

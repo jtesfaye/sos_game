@@ -1,10 +1,11 @@
 package com.github.jtesfaye.sosgame.util;
 
 import com.github.jtesfaye.sosgame.GameEvent.*;
-import com.github.jtesfaye.sosgame.GameIO.InputRouter;
-import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import lombok.Setter;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Condition;
@@ -22,13 +23,17 @@ public class GameEventProcessor {
     private final Condition cond = lock.newCondition();
     private Map<Class<? extends GameEvent>, List<Consumer<?>>> subscribers;
     private boolean endGame = false;
+    private final boolean isReplay;
 
-    public GameEventProcessor(ConcurrentLinkedQueue<GameEvent> queue) {
+    @Setter
+    private EventReaderWriter recorder;
+
+    public GameEventProcessor(ConcurrentLinkedQueue<GameEvent> queue, boolean replayMode) {
 
         subscribers = new HashMap<>();
         this.queue = queue;
         keep_going = true;
-
+        isReplay = replayMode;
     }
 
     public <T extends GameEvent> void addSubscriber(Class<T> EventType, Consumer<T> callback) {
@@ -43,14 +48,22 @@ public class GameEventProcessor {
     }
 
     public void addEvent(GameEvent e) {
+
         lock.lock();
         try {
+            if (isReplay) {
+                if (e.getClass() == StartReplayEvent.class) {
+                    cond.signalAll();
+                }
+                return;
+            }
+
             queue.add(e);
             cond.signalAll();
+
         } finally {
             lock.unlock();
         }
-
     }
 
     public void run() throws InterruptedException {
@@ -70,6 +83,10 @@ public class GameEventProcessor {
                 }
 
                 if (!keep_going) {
+
+                    if (!isReplay) {
+                        writeEvents();
+                    }
                     break;
                 }
 
@@ -99,8 +116,47 @@ public class GameEventProcessor {
                 if (c.getClass().isInstance(EndGameEvent.class)) {
                     endGame = true;
                 }
+
+                if (isReplay && event.getClass() == PieceSetEvent.class) {
+
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        System.out.println("Problem");
+                    }
+                } else {
+                    recordEvent(event);
+                }
+
                 ((Consumer<GameEvent>) c).accept(event);
+
             }
+        }
+    }
+
+    public void addReplayEvents(List<GameEvent> events) {
+
+        queue.addAll(events);
+    }
+
+    private void recordEvent(GameEvent e) {
+        if (recorder == null) {
+            return;
+        }
+
+        recorder.addEvent(e);
+    }
+
+    private void writeEvents() {
+
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter f= DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+        String fileName = time.format(f) + ".json";
+        try {
+            recorder.writeEvents(fileName);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

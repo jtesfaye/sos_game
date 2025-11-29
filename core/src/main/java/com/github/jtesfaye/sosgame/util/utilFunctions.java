@@ -27,7 +27,7 @@ public class utilFunctions {
         char[][] newBoard = new char[row][col];
 
         for (int i = 0; i < row; i++){
-            for (int j = 0; i < col; j++) {
+            for (int j = 0; j < col; j++) {
                 newBoard[i][j] = board[i][j].toString().charAt(0);
             }
         }

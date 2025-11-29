@@ -1,16 +1,10 @@
 package com.github.jtesfaye.sosgame.util;
 
 import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
-import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
-import com.github.jtesfaye.sosgame.GameIO.ClickInputHandler;
-import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import lombok.Value;
 
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 @Value
-public class ScreenInit {
+public class ScreenConfig {
 
     int boardWidth;
     int boardHeight;
