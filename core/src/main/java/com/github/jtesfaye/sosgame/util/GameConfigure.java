@@ -48,13 +48,10 @@ public class MenuInitializer {
 
     private Label difficultyLabel;
 
-    public Stage createStage(Skin skin) {
-
-        Stage stage = new Stage(new ScreenViewport());
+    public Table gameConfig(Skin skin) {
 
         Table table = new Table();
         table.setFillParent(true);
-        stage.addActor(table);
 
         table.add(title(skin)).colspan(2).padBottom(20);
         table.row();
@@ -142,7 +139,7 @@ public class MenuInitializer {
 
         table.add(startButton).colspan(2).padTop(20);
 
-        return stage;
+        return table;
     }
 
     public static TextButton getMainMenuButton(Skin skin, Main game, Screen s) {

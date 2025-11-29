@@ -13,24 +13,15 @@ public class GameLogicFactory {
 
         if (mode.equals("Simple")) {
 
-            return createSimpleGameLogic(row, height, players, p);
+            return new SimpleGameLogic(row, height, players, p);
 
         } else if (mode.equals("General")) {
 
-            return createGeneralGameLogic(row, height, players, p);
+            return new GeneralGameLogic(row, height, players, p);
 
         } else {
+
             throw new RuntimeException("Invalid game mode as argument");
         }
-    }
-
-    private static SimpleGameLogic createSimpleGameLogic(int r, int h, Player[] players, GameEventProcessor p) {
-
-        return new SimpleGameLogic(r, h, players, p);
-    }
-
-    private static GeneralGameLogic createGeneralGameLogic(int r, int h, Player[] players, GameEventProcessor p) {
-
-        return new GeneralGameLogic(r, h, players, p);
     }
 }
