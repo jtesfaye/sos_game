@@ -1,10 +1,7 @@
-package com.github.jtesfaye.sosgame.gameStrategy;
+package com.github.jtesfaye.sosgame.computer;
 
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public interface GameStrategy {
 

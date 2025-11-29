@@ -1,4 +1,4 @@
-package com.github.jtesfaye.sosgame.gameStrategy;
+package com.github.jtesfaye.sosgame.computer;
 
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class MediumGameStrategy implements GameStrategy {
-
 
     /*
         Iterate through all open spots, and find a spot that can form a SOS,
