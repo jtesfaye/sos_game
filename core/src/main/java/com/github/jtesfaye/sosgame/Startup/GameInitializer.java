@@ -98,7 +98,7 @@ public class GameInitializer {
                 }
                 break;
             case LLM:
-                p1handler = new LLMInputHandler(players[0].getPlayerId(), "");
+                p1handler = new LLMInputHandler(players[0].getPlayerId());
                 break;
             default:
                 throw new RuntimeException("Unrecognized player type");
@@ -115,7 +115,7 @@ public class GameInitializer {
                 }
                 break;
             case LLM:
-                p2handler = new LLMInputHandler(players[1].getPlayerId(), "");
+                p2handler = new LLMInputHandler(players[1].getPlayerId());
                 break;
             default:
                 throw new RuntimeException("Unrecognized player type");
