@@ -1,4 +1,4 @@
-package com.github.jtesfaye.sosgame.computer;
+package com.github.jtesfaye.sosgame.Computer;
 
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;

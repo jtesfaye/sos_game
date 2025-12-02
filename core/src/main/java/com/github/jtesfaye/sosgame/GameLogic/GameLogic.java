@@ -1,17 +1,14 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
-import com.badlogic.gdx.graphics.Color;
 import com.github.jtesfaye.sosgame.GameEvent.*;
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Player;
-import com.github.jtesfaye.sosgame.util.GameEventProcessor;
+import com.github.jtesfaye.sosgame.GameEventProcessor;
 import com.github.jtesfaye.sosgame.util.Pair;
 import lombok.Getter;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.stream.IntStream;
 
 public abstract class GameLogic {

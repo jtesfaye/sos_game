@@ -1,9 +1,9 @@
 package com.github.jtesfaye.sosgame.Screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.GameEvent.StartReplayEvent;
+import com.github.jtesfaye.sosgame.GameEventProcessor;
 import com.github.jtesfaye.sosgame.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -12,10 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.github.jtesfaye.sosgame.util.*;
+import com.github.jtesfaye.sosgame.Replay.EventReaderWriter;
+import com.github.jtesfaye.sosgame.Replay.GameRecord;
+import com.github.jtesfaye.sosgame.Startup.GameConfigure;
+import com.github.jtesfaye.sosgame.Startup.GameInitializer;
 
-import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -119,7 +120,6 @@ public class MainMenuScreen implements Screen {
                             @Override
                             public void changed(ChangeEvent changeEvent, Actor actor) {
                                 window.remove();
-                                System.out.println(f.name());
                                 startReplay(f);
                             }
                         });

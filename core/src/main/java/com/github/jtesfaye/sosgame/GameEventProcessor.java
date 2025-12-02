@@ -1,6 +1,7 @@
-package com.github.jtesfaye.sosgame.util;
+package com.github.jtesfaye.sosgame;
 
 import com.github.jtesfaye.sosgame.GameEvent.*;
+import com.github.jtesfaye.sosgame.Replay.EventReaderWriter;
 import lombok.Setter;
 
 import java.io.IOException;

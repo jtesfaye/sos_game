@@ -19,10 +19,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.github.jtesfaye.sosgame.BoardComponents.*;
 import com.github.jtesfaye.sosgame.GameEvent.*;
+import com.github.jtesfaye.sosgame.GameEventProcessor;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Tile;
 import com.github.jtesfaye.sosgame.GameIO.GdxInput;
 import com.github.jtesfaye.sosgame.Main;
+import com.github.jtesfaye.sosgame.Startup.GameConfigure;
+import com.github.jtesfaye.sosgame.Startup.GameInitializer;
 import com.github.jtesfaye.sosgame.util.*;
 
 import java.util.ArrayList;

@@ -10,17 +10,12 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.github.jtesfaye.sosgame.GameEvent.InputEvent;
 import com.github.jtesfaye.sosgame.GameEvent.turnChangeEvent;
-import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
 import com.github.jtesfaye.sosgame.GameObject.Player;
-import com.github.jtesfaye.sosgame.util.GameEventProcessor;
+import com.github.jtesfaye.sosgame.GameEventProcessor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 public class GdxInput extends InputAdapter {
 

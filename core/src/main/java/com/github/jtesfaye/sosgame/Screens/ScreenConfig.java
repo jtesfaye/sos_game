@@ -1,4 +1,4 @@
-package com.github.jtesfaye.sosgame.util;
+package com.github.jtesfaye.sosgame.Screens;
 
 import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
 import lombok.Value;

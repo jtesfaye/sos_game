@@ -5,9 +5,8 @@ import com.github.jtesfaye.sosgame.GameEvent.onNextTurnEvent;
 import com.github.jtesfaye.sosgame.GameEvent.turnChangeEvent;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
 import com.github.jtesfaye.sosgame.GameObject.Player;
-import com.github.jtesfaye.sosgame.util.GameEventProcessor;
+import com.github.jtesfaye.sosgame.GameEventProcessor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

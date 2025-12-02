@@ -1,8 +1,7 @@
-package com.github.jtesfaye.sosgame.util;
+package com.github.jtesfaye.sosgame.Screens;
 
 import com.github.jtesfaye.sosgame.GameIO.InputRouter;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
-import com.github.jtesfaye.sosgame.Screens.GameScreen;
 
 public class NewGameConfig {
 

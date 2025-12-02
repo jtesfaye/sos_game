@@ -24,4 +24,8 @@ public class Move {
         col = c;
         piece = p;
     }
+
+    public static String jsonSchema() {
+        return "{\"row\": number, \"col\": number, \"piece\": \"sPiece\" | \"oPiece\"";
+    }
 }

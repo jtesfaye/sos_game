@@ -1,4 +1,4 @@
-package com.github.jtesfaye.sosgame.util;
+package com.github.jtesfaye.sosgame.Startup;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.jtesfaye.sosgame.BoardComponents.BoardBuilder;
 import com.github.jtesfaye.sosgame.BoardComponents.TileModel;
+import com.github.jtesfaye.sosgame.GameEventProcessor;
 import com.github.jtesfaye.sosgame.GameIO.*;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogicFactory;
 import com.github.jtesfaye.sosgame.GameLogic.GameLogic;
@@ -21,9 +22,15 @@ import com.github.jtesfaye.sosgame.GameObject.Player;
 import com.github.jtesfaye.sosgame.GameObject.PlayerFactory;
 import com.github.jtesfaye.sosgame.Main;
 import com.github.jtesfaye.sosgame.Screens.GameScreen;
-import com.github.jtesfaye.sosgame.computer.EasyGameStrategy;
-import com.github.jtesfaye.sosgame.computer.HardGameStrategy;
-import com.github.jtesfaye.sosgame.computer.MediumGameStrategy;
+import com.github.jtesfaye.sosgame.Screens.NewGameConfig;
+import com.github.jtesfaye.sosgame.Screens.ScreenConfig;
+import com.github.jtesfaye.sosgame.Computer.EasyGameStrategy;
+import com.github.jtesfaye.sosgame.Computer.HardGameStrategy;
+import com.github.jtesfaye.sosgame.Computer.MediumGameStrategy;
+import com.github.jtesfaye.sosgame.Replay.EventReaderWriter;
+import com.github.jtesfaye.sosgame.Replay.GameRecord;
+import com.github.jtesfaye.sosgame.util.Pair;
+import com.github.jtesfaye.sosgame.util.utilFunctions;
 
 import java.util.Arrays;
 
@@ -83,7 +90,7 @@ public class GameInitializer {
         };
     }
 
-    private static InputRouter initializeInputRouter(GameLogic logic, Player[] players, String diff ,GameEventProcessor p) {
+    private static InputRouter initializeInputRouter(GameLogic logic, Player[] players, String diff , GameEventProcessor p) {
 
         InputHandler p1handler, p2handler;
 

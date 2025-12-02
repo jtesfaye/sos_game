@@ -1,10 +1,7 @@
 package com.github.jtesfaye.sosgame.GameLogic;
 
-import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
 import com.github.jtesfaye.sosgame.GameObject.Player;
-import com.github.jtesfaye.sosgame.util.GameEventProcessor;
-
-import java.util.Queue;
+import com.github.jtesfaye.sosgame.GameEventProcessor;
 
 public class GameLogicFactory {
 
