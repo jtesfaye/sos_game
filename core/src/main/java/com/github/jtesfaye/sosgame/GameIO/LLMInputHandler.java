@@ -1,71 +1,56 @@
 package com.github.jtesfaye.sosgame.GameIO;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.jtesfaye.sosgame.GameEvent.InputEvent;
 import com.github.jtesfaye.sosgame.GameObject.Move;
 import com.github.jtesfaye.sosgame.GameObject.Piece;
-import com.github.jtesfaye.sosgame.util.Pair;
+import com.github.jtesfaye.sosgame.Gemini.GeminiResponseSchema;
 import com.github.jtesfaye.sosgame.util.utilFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.UUID;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import com.github.jtesfaye.sosgame.Gemini.GeminiRequest;
 
 public class LLMInputHandler extends InputHandler {
 
-    private final String API_KEY = System.getenv("SOS_API_KEY");
-    private final String URL;
-
-    class RequestSchema {
-
-        @Getter
-        String objective = objective =
-            """
-                Play like its Tic tac toe, but instead of X and O its S and O. \n"
-                Refer to the "board" field to see the current state of the game board \n"
-                Select a row column pair listed in the validMoves field \n"
-                Your response needs to be in JSON format in the form: {row: number, col: number, piece: "S" | "O"}
-            """;
-
-        @Getter
-        public List<Pair<Integer, Integer>> validMoves;
-
-        @Getter
-        public char[][] board;
-
-        public RequestSchema(char[][] b, List<Pair<Integer, Integer>> valid) {
-            board = b;
-            validMoves = valid;
-        }
-    };
-
-    public LLMInputHandler(UUID id, String URL) {
+    public LLMInputHandler(UUID id) {
         super(id, InputType.NetworkIO);
-        this.URL = !URL.isEmpty() ? URL : "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
     }
 
     public Move makeRequest(Piece[][] board) {
 
         char[][] charBoard = utilFunctions.boardToCharArr(board);
-        RequestSchema reqSchema = new RequestSchema(charBoard, utilFunctions.getOpenPositions(board));
 
-        ObjectMapper mapper = new ObjectMapper();
+        String prompt = """
+                Play like its Tic tac toe, but instead of X and O its S and O.
+                Refer to the "board" field to see the current state of the game board
+                Select a row column pair listed in the validMoves field
+                Your response needs to be in JSON format in the form: {row: number, col: number, piece: "sPiece" | "oPiece"}
+
+                Board:
+                %s
+
+                Valid moves
+                %s
+                """.formatted(
+                    utilFunctions.boardToCharArr(board),
+                    utilFunctions.getOpenPositions(board).toString());
 
         try {
 
-            String requestJSON = mapper.writeValueAsString(reqSchema);
+            String requestJSON = GeminiRequest.generateRequest(prompt, Move.class);
 
             HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest req = HttpRequest.newBuilder()
-                .uri(new URI(URL + "/" + API_KEY))
+                .uri(new URI(GeminiRequest.URL))
+                .header("x-goog-api-key", GeminiRequest.API_KEY)
                 .header("accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestJSON))
                 .build();
@@ -74,11 +59,13 @@ public class LLMInputHandler extends InputHandler {
 
             if (resp.statusCode() == 200) {
                 InputStream body = resp.body();
-                Move move = mapper.readValue(body, Move.class);
-                return move;
+                ObjectMapper mapper = new ObjectMapper();
+                GeminiResponseSchema gresp = mapper.readValue(body, GeminiResponseSchema.class);
+                String text = gresp.getCandidates().get(0).getContent().getParts().get(0).getText();
+                return mapper.readValue(text, Move.class);
 
             } else {
-                return new Move(0,0, Piece.sPiece);
+                throw new RuntimeException("Network failure");
             }
 
         } catch (InterruptedException | URISyntaxException | IOException e) {
@@ -91,6 +78,5 @@ public class LLMInputHandler extends InputHandler {
 
        Move move = makeRequest(board);
        consumer.accept(new InputEvent(move, playerId));
-
     }
 }
