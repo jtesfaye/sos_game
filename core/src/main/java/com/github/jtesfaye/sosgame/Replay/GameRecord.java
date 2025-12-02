@@ -1,8 +1,9 @@
-package com.github.jtesfaye.sosgame.util;
+package com.github.jtesfaye.sosgame.Replay;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.jtesfaye.sosgame.GameObject.Player;
 import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
+import com.github.jtesfaye.sosgame.util.Pair;
 
 import java.util.List;
 

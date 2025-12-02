@@ -1,10 +1,10 @@
-package com.github.jtesfaye.sosgame.util;
+package com.github.jtesfaye.sosgame.Replay;
 import com.badlogic.gdx.Gdx;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.jtesfaye.sosgame.GameEvent.GameEvent;
 import com.github.jtesfaye.sosgame.GameObject.Player;
+import com.github.jtesfaye.sosgame.util.Pair;
 
 import java.io.File;
 import java.io.IOException;
