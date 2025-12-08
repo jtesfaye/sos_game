@@ -37,8 +37,9 @@ public class MediumGameStrategy implements GameStrategy {
         }
 
         for (Pair<Integer, Integer> rowCol : openSpots) {
-            int row = rowCol.first;
-            int col = rowCol.second;
+
+            int row = rowCol.first();
+            int col = rowCol.second();
 
             boardCopy[row][col] = Piece.sPiece;
 
@@ -57,7 +58,7 @@ public class MediumGameStrategy implements GameStrategy {
         Pair<Integer,Integer> tile = openSpots.get(rand.nextInt(openSpots.size()));
         Piece piece = rand.nextBoolean() ? Piece.sPiece : Piece.oPiece;
 
-        return new Move(tile.first, tile.second, piece);
+        return new Move(tile.first(), tile.second(), piece);
     }
 
     private boolean checkforSOS(int row, int col, Piece[][] board, SOSChecker checker) {

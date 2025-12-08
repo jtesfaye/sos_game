@@ -196,9 +196,9 @@ public class GameScreen implements Screen {
             Pair<Integer, Integer> tile2 = e.tile2;
             Pair<Integer, Integer> tile3 = e.tile3;
 
-            Vector3 start = tiles.get(tile1.first).get(tile1.second).worldCenter;
-            Vector3 middle = tiles.get(tile2.first).get(tile2.second).worldCenter;
-            Vector3 end = tiles.get(tile3.first).get(tile3.second).worldCenter;
+            Vector3 start = tiles.get(tile1.first()).get(tile1.second()).worldCenter;
+            Vector3 middle = tiles.get(tile2.first()).get(tile2.second()).worldCenter;
+            Vector3 end = tiles.get(tile3.first()).get(tile3.second()).worldCenter;
 
             modelsToRender.add(SOSSlashModel.SOSSlashInstance(start, middle, end, e.color));
 
@@ -240,7 +240,7 @@ public class GameScreen implements Screen {
             StringBuilder score = new StringBuilder("Current Score:\n");
             for (Pair<String, String> item : scores) {
 
-                score.append(item.first).append(": ").append(item.second).append("  ");
+                score.append(item.first()).append(": ").append(item.second()).append("  ");
 
             }
 

@@ -51,8 +51,8 @@ public class GameInitializer {
 
         Pair<Integer, Integer> dimensions = utilFunctions.getBoardDimensions(boardSize);
 
-        width = dimensions.first;
-        height = dimensions.second;
+        width = dimensions.first();
+        height = dimensions.second();
 
         Player[] players = createPlayers(p1, p2, p1Color, p2Color);
 
@@ -73,8 +73,8 @@ public class GameInitializer {
 
     public static GameScreen setupReplay(GameRecord record, Main mGame) {
 
-        int row = record.boardDim().first;
-        int col = record.boardDim().second;
+        int row = record.boardDim().first();
+        int col = record.boardDim().second();
         Player[] players = record.players().toArray(new Player[0]);
         BoardBuilder builder = new BoardBuilder(row, col);
         ScreenConfig s = new ScreenConfig(row, col, builder, record.gameMode(), players[1].getDescription());
@@ -206,7 +206,6 @@ public class GameInitializer {
         camera.update();
 
         return camera;
-
     }
 
     static private ComputerInputHandler setComputerHandler(Player p, String diff) {
@@ -232,7 +231,6 @@ public class GameInitializer {
     static private Color getColor(String color) {
 
         switch (color) {
-
             case "BLUE":
                 return Color.BLUE;
 
