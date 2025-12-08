@@ -19,14 +19,12 @@ public class GeminiRequest {
     public static final String URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
     public static final String API_KEY = System.getenv("SOS_KEY_TWO");
 
-    private static final Map<String, Object> base = new HashMap<>();
-    public static final Map<String, Object> generationConfig = new HashMap<>();
-
     public static String generateRequest(String prompt, Class<?> schema) throws JsonProcessingException {
+        Map<String, Object> base = new HashMap<>();
+        Map<String, Object> generationConfig;
 
         base.put("contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))));
-
-        setGenerationConfig(schema);
+        generationConfig = setGenerationConfig(schema);
 
         base.put("generationConfig", generationConfig);
 
@@ -35,9 +33,13 @@ public class GeminiRequest {
         return mapper.writeValueAsString(base);
     }
 
-    private static void setGenerationConfig(Class<?> schema) throws JsonProcessingException {
-        generationConfig.put("responseMimeType", "application/json");
-        generationConfig.put("responseJsonSchema", extractProperty(schemaGen.generateSchema(schema)));
+    private static Map<String, Object> setGenerationConfig(Class<?> schema) throws JsonProcessingException {
+        Map<String, Object> gen = new HashMap<>();
+
+        gen.put("responseMimeType", "application/json");
+        gen.put("responseJsonSchema", extractProperty(schemaGen.generateSchema(schema)));
+
+        return gen;
     }
 
     private static Object extractProperty(JsonSchema schema) {
