@@ -32,6 +32,8 @@ public class LLMInputHandler extends InputHandler {
 
         String prompt = """
                 Play like its Tic tac toe, but instead of X and O its S and O.
+                To score, form an "SOS" on the board and it can be horizontal, vertical or diagonal.
+                Play with the intent to win, whether it involves blocking the player from scoring, or scoring for yourself
                 Refer to the "board" field to see the current state of the game board
                 Select a row column pair listed in the validMoves field
                 Your response needs to be in JSON format in the form: {row: number, col: number, piece: "sPiece" | "oPiece"}
